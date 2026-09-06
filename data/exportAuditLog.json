@@ -1,5 +1,45 @@
 [
   {
+    "id": "AUD-780763",
+    "timestamp": "2026-09-06T18:19:40.763Z",
+    "role": "cxo",
+    "action": "COPILOT_QUERY",
+    "target": "Show Sales department attrition",
+    "recordCount": 1,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-775784",
+    "timestamp": "2026-09-06T18:19:35.784Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 1: Headcount Trend & Movement",
+    "recordCount": 600,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-768608",
+    "timestamp": "2026-09-06T18:19:28.608Z",
+    "role": "cxo",
+    "action": "COPILOT_QUERY",
+    "target": "What is our total leave encashment liability?",
+    "recordCount": 1,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-765239",
+    "timestamp": "2026-09-06T18:19:25.239Z",
+    "role": "cxo",
+    "action": "COPILOT_QUERY",
+    "target": "What is our active headcount and 6-month trend?",
+    "recordCount": 1,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
     "id": "AUD-532342",
     "timestamp": "2026-09-06T18:15:32.342Z",
     "role": "employee",

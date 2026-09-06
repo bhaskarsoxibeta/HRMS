@@ -1,6 +1,6 @@
 /**
  * ReportOS — Universal HR Reporting Engine Frontend Application
- * Pure Vanilla JavaScript — Enterprise RBAC Edition
+ * Pure Vanilla JavaScript — Enterprise RBAC & Dual Theme Edition
  */
 
 (function () {
@@ -13,6 +13,7 @@
     currentView: 'dashboard',
     currentRole: 'cxo',
     currentEntity: 'All',
+    currentTheme: localStorage.getItem('reportos_theme') || 'light',
     meta: { entities: [], departments: [], locations: [], employmentTypes: [] },
     fieldCatalog: null,
     builderSelectedFields: ['id', 'name', 'dept', 'entity', 'employmentType', 'ctc'],
@@ -69,6 +70,7 @@
   const breadcrumbCurrentEl = document.getElementById('breadcrumb-current');
   const quickExportBtn = document.getElementById('quick-export-btn');
   const printBriefBtn = document.getElementById('print-brief-btn');
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
   const toastContainer = document.getElementById('toast-container');
   const modalBackdrop = document.getElementById('modal-backdrop');
   const modalTitle = document.getElementById('modal-title');
@@ -80,6 +82,28 @@
   const personaNameEl = document.getElementById('persona-name');
   const personaScopeEl = document.getElementById('persona-scope');
   const navReportsCountEl = document.getElementById('nav-reports-count');
+
+  // --------------------------------------------------------------------------
+  // Theme Toggle Engine
+  // --------------------------------------------------------------------------
+  function applyTheme(theme) {
+    state.currentTheme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('reportos_theme', theme);
+    if (themeToggleBtn) {
+      themeToggleBtn.textContent = `THEME: ${theme.toUpperCase()}`;
+    }
+  }
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const nextTheme = state.currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(nextTheme);
+      showToast(`Switched to ${nextTheme.toUpperCase()} theme`);
+    });
+  }
+
+  applyTheme(state.currentTheme);
 
   // --------------------------------------------------------------------------
   // API Fetch Utilities
@@ -126,10 +150,46 @@
     if (e.target === modalBackdrop) closeModal();
   });
 
+  // --------------------------------------------------------------------------
+  // Executive PDF / Print Brief Handler
+  // --------------------------------------------------------------------------
   if (printBriefBtn) {
-    printBriefBtn.addEventListener('click', () => {
-      showToast('Opening print dialog for executive brief...');
-      window.print();
+    printBriefBtn.addEventListener('click', async () => {
+      showToast('Generating executive brief preview...');
+      try {
+        const kpis = await fetchJson(`/api/kpis?role=${state.currentRole}&entity=${state.currentEntity}`);
+        const config = ROLE_CONFIG[state.currentRole] || ROLE_CONFIG.cxo;
+        
+        let kpiSummaryHtml = '<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; margin-top:16px;">';
+        kpis.forEach(k => {
+          kpiSummaryHtml += `
+            <div style="border:1px solid var(--border); padding:12px; background:var(--bg-surface);">
+              <div style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--ink-secondary);">${k.label}</div>
+              <div style="font-family:var(--font-serif); font-size:24px; font-weight:700; color:var(--ink); margin:4px 0;">${k.value}</div>
+              <div style="font-size:11px; color:var(--accent);">${k.delta} • ${k.subtext}</div>
+            </div>
+          `;
+        });
+        kpiSummaryHtml += '</div>';
+
+        showModal(
+          `Executive Brief — ${config.name}`,
+          `<div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--ink-secondary); border-bottom:1px solid var(--border); padding-bottom:8px;">
+              PERSPECTIVE: ${state.currentRole.toUpperCase()} | ENTITY SCOPE: ${state.currentEntity} | DATE: ${new Date().toLocaleDateString()}
+            </div>
+            <p style="margin-top:10px; font-size:13px; color:var(--ink);">
+              Below is the verified summary report brief compiled across active personnel rosters:
+            </p>
+            ${kpiSummaryHtml}
+            <div style="margin-top:20px; text-align:right;">
+              <button class="btn btn-secondary" onclick="window.print()" style="margin-right:8px;">Print / Save as PDF</button>
+            </div>
+          </div>`
+        );
+      } catch (err) {
+        window.print();
+      }
     });
   }
 
@@ -140,7 +200,7 @@
     if (!data || data.length === 0) return '<div style="padding:20px; text-align:center; color:var(--ink-secondary);">No data for current scope</div>';
 
     const maxVal = Math.max(...data.map(d => d.v), 1);
-    const labelWidth = 110;
+    const labelWidth = 120;
     const chartWidth = width - labelWidth - 60;
     const rowHeight = Math.max(28, Math.floor((height - 30) / data.length));
     const actualHeight = data.length * rowHeight + 20;
@@ -151,14 +211,14 @@
       const y = idx * rowHeight + 10;
       const barWidth = Math.max(4, (item.v / maxVal) * chartWidth);
       const isMax = item.v === maxVal;
-      const barColor = isMax ? '#c1521f' : '#1a1714';
+      const barColor = isMax ? 'var(--accent)' : 'var(--ink)';
 
-      svg += `<text x="${labelWidth - 10}" y="${y + 14}" text-anchor="end" class="chart-tick-label" fill="#1a1714">${item.k}</text>`;
-      svg += `<rect x="${labelWidth}" y="${y + 2}" width="${chartWidth}" height="${rowHeight - 10}" fill="#e8e2d6" />`;
+      svg += `<text x="${labelWidth - 10}" y="${y + 14}" text-anchor="end" class="chart-tick-label" fill="var(--ink)">${item.k}</text>`;
+      svg += `<rect x="${labelWidth}" y="${y + 2}" width="${chartWidth}" height="${rowHeight - 10}" fill="var(--bg-surface)" />`;
       svg += `<rect x="${labelWidth}" y="${y + 2}" width="${barWidth}" height="${rowHeight - 10}" fill="${barColor}">
         <title>${item.k}: ${item.v}${unit ? ' ' + unit : ''}</title>
       </rect>`;
-      svg += `<text x="${labelWidth + barWidth + 8}" y="${y + 14}" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#1a1714">${item.v}${unit ? unit : ''}</text>`;
+      svg += `<text x="${labelWidth + barWidth + 8}" y="${y + 14}" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="var(--ink)">${item.v}${unit ? unit : ''}</text>`;
     });
 
     svg += `</svg>`;
@@ -195,7 +255,7 @@
       svg += `<text x="${padding.left - 8}" y="${y + 3}" text-anchor="end" class="chart-tick-label">${Math.round(stepVal)}</text>`;
     }
 
-    svg += `<path d="${areaPath}" fill="#faece6" opacity="0.7" />`;
+    svg += `<path d="${areaPath}" fill="var(--accent-light)" opacity="0.7" />`;
     svg += `<path d="${linePath}" class="chart-line-path" />`;
 
     points.forEach(p => {
@@ -259,7 +319,7 @@
       </path>`;
     });
 
-    svg += `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-family="Playfair Display" font-size="14" font-weight="700" fill="#1a1714">Mix</text>`;
+    svg += `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-family="Playfair Display" font-size="14" font-weight="700" fill="var(--ink)">Mix</text>`;
     svg += `</svg>`;
 
     svg += `<div class="donut-legend">`;
@@ -292,11 +352,30 @@
     breadcrumbCurrentEl.textContent = 'Dashboard';
     updatePersonaUi();
 
+    // Determine custom chart titles based on role
+    let chart1Title = 'Headcount Trajectory (Trailing 6 Months)';
+    let chart2Title = 'Workforce Gender Mix';
+    let chart3Title = 'TTM Attrition Rate by Operating Department';
+
+    if (state.currentRole === 'employee') {
+      chart1Title = 'My Monthly Activity & Presence Trend';
+      chart2Title = 'My Annual Leave Utilization Mix';
+      chart3Title = 'My Target Performance Goal Milestones';
+    } else if (state.currentRole === 'manager') {
+      chart1Title = 'Direct Reports Pod Trajectory';
+      chart2Title = 'Pod Workforce Gender Mix';
+      chart3Title = 'Direct Reports Presence Rate (%)';
+    } else if (state.currentRole === 'hrbp') {
+      chart1Title = 'Sales Headcount Trajectory (Trailing 6 Months)';
+      chart2Title = 'Sales Workforce Gender Mix';
+      chart3Title = 'Sales Attrition Rate by Office Location';
+    }
+
     mainEl.innerHTML = `
       <div class="page-header">
         <div>
           <h2 class="page-title">Executive Dashboard</h2>
-          <p class="page-subtitle">Perspective: <strong style="color:var(--ink);">${state.currentRole.toUpperCase()}</strong> • Scoped real-time analytics</p>
+          <p class="page-subtitle">Perspective: <strong style="color:var(--ink);">${state.currentRole.toUpperCase()}</strong> • Scoped real-time analytics • Entity: <strong style="color:var(--ink);">${state.currentEntity}</strong></p>
         </div>
         <div class="page-meta">
           <span>DATA ANCHOR: JUNE 2026</span>
@@ -311,7 +390,7 @@
         <div class="charts-grid">
           <div class="chart-card">
             <div class="chart-header">
-              <h3 class="chart-title">Headcount Trajectory (Trailing 6 Months)</h3>
+              <h3 class="chart-title">${chart1Title}</h3>
               <span class="chart-meta">Role Scoped</span>
             </div>
             <div class="chart-container" id="chart-headcount-trend">Loading trend chart...</div>
@@ -319,25 +398,25 @@
 
           <div class="chart-card">
             <div class="chart-header">
-              <h3 class="chart-title">Workforce Gender Mix</h3>
-              <span class="chart-meta">Active Personnel</span>
+              <h3 class="chart-title">${chart2Title}</h3>
+              <span class="chart-meta">Composition</span>
             </div>
             <div class="chart-container" id="chart-gender-mix">Loading composition...</div>
           </div>
 
           <div class="chart-card full-bleed">
             <div class="chart-header">
-              <h3 class="chart-title">TTM Attrition Rate by Operating Department</h3>
-              <span class="chart-meta">Role Scoped Separations</span>
+              <h3 class="chart-title">${chart3Title}</h3>
+              <span class="chart-meta">Analytical Scope</span>
             </div>
-            <div class="chart-container" id="chart-attrition-dept">Loading department attrition...</div>
+            <div class="chart-container" id="chart-attrition-dept">Loading analytical breakdown...</div>
           </div>
         </div>
       </div>
     `;
 
     try {
-      const kpis = await fetchJson(`/api/kpis?role=${state.currentRole}`);
+      const kpis = await fetchJson(`/api/kpis?role=${state.currentRole}&entity=${state.currentEntity}`);
       const host = document.getElementById('kpi-cards-host');
       if (host && kpis.length > 0) {
         let html = '';
@@ -363,7 +442,7 @@
     }
 
     try {
-      const trendData = await fetchJson(`/api/charts/headcount-trend?role=${state.currentRole}`);
+      const trendData = await fetchJson(`/api/charts/headcount-trend?role=${state.currentRole}&entity=${state.currentEntity}`);
       const container = document.getElementById('chart-headcount-trend');
       if (container) container.innerHTML = createLineChartSvg(trendData, { width: 520, height: 210, unit: 'personnel' });
     } catch (err) {
@@ -371,7 +450,7 @@
     }
 
     try {
-      const mixData = await fetchJson(`/api/charts/gender-mix?role=${state.currentRole}`);
+      const mixData = await fetchJson(`/api/charts/gender-mix?role=${state.currentRole}&entity=${state.currentEntity}`);
       const container = document.getElementById('chart-gender-mix');
       if (container) container.innerHTML = createDonutChartSvg(mixData, { size: 170 });
     } catch (err) {
@@ -379,7 +458,7 @@
     }
 
     try {
-      const attritionData = await fetchJson(`/api/charts/attrition-by-dept?role=${state.currentRole}`);
+      const attritionData = await fetchJson(`/api/charts/attrition-by-dept?role=${state.currentRole}&entity=${state.currentEntity}`);
       const container = document.getElementById('chart-attrition-dept');
       if (container) container.innerHTML = createHorizontalBarChartSvg(attritionData, { width: 900, height: 180, unit: '%' });
     } catch (err) {
@@ -1201,6 +1280,7 @@
       entitySelectEl.addEventListener('change', () => {
         state.currentEntity = entitySelectEl.value;
         showToast(`Filtered perspective to ${state.currentEntity}`);
+        if (state.currentView === 'dashboard') renderDashboard();
       });
     }
 
