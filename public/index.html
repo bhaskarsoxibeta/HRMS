@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ReportOS — Universal HR Reporting Engine</title>
   
-  <!-- Typography: Playfair Display (Serif/Headlines), DM Sans (Workhorse UI), IBM Plex Mono (Data) -->
+  <!-- Typography: Playfair Display, DM Sans, IBM Plex Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
@@ -22,8 +22,18 @@
         </div>
         <div class="brand-text">
           <h1 class="brand-title">ReportOS</h1>
-          <span class="brand-edition">Universal HR Engine</span>
+          <span class="brand-edition">Enterprise RBAC Edition</span>
         </div>
+      </div>
+
+      <!-- Active Persona / Identity Scoping Card -->
+      <div class="persona-card" id="persona-card">
+        <div class="persona-header">
+          <span class="persona-label">ACTIVE PERSONA</span>
+          <span class="persona-badge" id="persona-badge">SUPER ADMIN</span>
+        </div>
+        <div class="persona-name" id="persona-name">CXO Executive View</div>
+        <div class="persona-scope" id="persona-scope">Global Scope: 4 Operating Entities</div>
       </div>
 
       <nav class="nav-menu">
@@ -35,27 +45,35 @@
         <a href="#library" class="nav-item" data-view="library">
           <span class="nav-indicator"></span>
           <span class="nav-label">Report Library</span>
-          <span class="nav-badge">21</span>
+          <span class="nav-badge" id="nav-reports-count">21</span>
         </a>
         <a href="#builder" class="nav-item" data-view="builder">
           <span class="nav-indicator"></span>
           <span class="nav-label">Custom Builder</span>
         </a>
 
-        <div class="nav-section-label">Intelligence</div>
+        <div class="nav-section-label">Intelligence &amp; Operations</div>
         <a href="#copilot" class="nav-item" data-view="copilot">
           <span class="nav-indicator"></span>
           <span class="nav-label">AI Copilot</span>
           <span class="nav-badge-pill">Grounded</span>
+        </a>
+        <a href="#schedules" class="nav-item" data-view="schedules">
+          <span class="nav-indicator"></span>
+          <span class="nav-label">Automated Schedules</span>
+        </a>
+        <a href="#audit" class="nav-item" data-view="audit">
+          <span class="nav-indicator"></span>
+          <span class="nav-label">Security &amp; Audit Trail</span>
         </a>
       </nav>
 
       <div class="sidebar-footer">
         <div class="system-status">
           <span class="status-dot"></span>
-          <span class="status-text">600 Verified Records</span>
+          <span class="status-text" id="footer-status-text">600 Verified Records</span>
         </div>
-        <div class="system-meta">Zero Dependency Engine v1.0</div>
+        <div class="system-meta">Zero Dependency Engine v2.0</div>
       </div>
     </aside>
 
@@ -74,13 +92,13 @@
         <div class="topbar-right">
           <!-- Role Perspective Selector -->
           <div class="control-group">
-            <label class="control-label" for="role-select">Role Perspective</label>
+            <label class="control-label" for="role-select">Role Identity</label>
             <select id="role-select" class="select-input">
               <option value="cxo">CXO (Enterprise Executive)</option>
-              <option value="chro">CHRO (Chief Human Resources)</option>
-              <option value="hrbp">HRBP (Sales Scope)</option>
-              <option value="manager">Line Manager (Pod Scope)</option>
-              <option value="employee">Employee (ESS Portal)</option>
+              <option value="chro">CHRO (Chief HR Officer)</option>
+              <option value="hrbp">HRBP (Sales Department Scope)</option>
+              <option value="manager">Line Manager (Management Pod)</option>
+              <option value="employee">Employee (Self-Service ESS)</option>
             </select>
           </div>
 
@@ -93,8 +111,11 @@
           </div>
 
           <div class="topbar-actions">
-            <button id="quick-export-btn" class="btn btn-secondary">
-              Export View
+            <button id="print-brief-btn" class="btn btn-secondary">
+              Print Brief / PDF
+            </button>
+            <button id="quick-export-btn" class="btn btn-primary">
+              Export Roster CSV
             </button>
           </div>
         </div>

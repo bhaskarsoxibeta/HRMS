@@ -1,0 +1,272 @@
+[
+  {
+    "id": "AUD-532342",
+    "timestamp": "2026-09-06T18:15:32.342Z",
+    "role": "employee",
+    "action": "COPILOT_QUERY",
+    "target": "What is executive payroll budget?",
+    "recordCount": 1,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532334",
+    "timestamp": "2026-09-06T18:15:32.334Z",
+    "role": "cxo",
+    "action": "CREATE_SCHEDULE",
+    "target": "Schedule: Daily Attendance Digest (Daily (08:00 AM))",
+    "recordCount": 1,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532330",
+    "timestamp": "2026-09-06T18:15:32.330Z",
+    "role": "employee",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 1: Headcount Trend & Movement",
+    "recordCount": 1,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532325",
+    "timestamp": "2026-09-06T18:15:32.325Z",
+    "role": "employee",
+    "action": "ACCESS_DENIED",
+    "target": "Report 6: CTC Breakup & Cost Analysis",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "BLOCKED_RBAC"
+  },
+  {
+    "id": "AUD-532324",
+    "timestamp": "2026-09-06T18:15:32.324Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 21: Exit Interview Themes & Root Cause",
+    "recordCount": 4,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532320",
+    "timestamp": "2026-09-06T18:15:32.320Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 20: Engagement Survey Results (eNPS)",
+    "recordCount": 5,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532316",
+    "timestamp": "2026-09-06T18:15:32.316Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 19: Skill Gap Heatmap by Role",
+    "recordCount": 4,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532314",
+    "timestamp": "2026-09-06T18:15:32.314Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 18: Training Hours & Completion Rate",
+    "recordCount": 5,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532310",
+    "timestamp": "2026-09-06T18:15:32.310Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 17: Audit Trail & Access Log",
+    "recordCount": 18,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532308",
+    "timestamp": "2026-09-06T18:15:32.308Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 16: POSH Case Register & Compliance Audit",
+    "recordCount": 4,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532306",
+    "timestamp": "2026-09-06T18:15:32.306Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 15: Rating Distribution & 9-Box Grid",
+    "recordCount": 524,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532300",
+    "timestamp": "2026-09-06T18:15:32.300Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 14: Overtime Trend & Burnout Risk",
+    "recordCount": 524,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532295",
+    "timestamp": "2026-09-06T18:15:32.295Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 13: Statutory Contribution Summary",
+    "recordCount": 4,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532290",
+    "timestamp": "2026-09-06T18:15:32.290Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 12: Offer Acceptance & Decline Reasons",
+    "recordCount": 81,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532288",
+    "timestamp": "2026-09-06T18:15:32.288Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 11: Span of Control & Org Hierarchy",
+    "recordCount": 306,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532281",
+    "timestamp": "2026-09-06T18:15:32.281Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 10: Appraisal Cycle Completion",
+    "recordCount": 524,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532276",
+    "timestamp": "2026-09-06T18:15:32.276Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 9: Absenteeism & Attendance Trend",
+    "recordCount": 524,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532270",
+    "timestamp": "2026-09-06T18:15:32.270Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 8: Leave Liability Report",
+    "recordCount": 4,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532265",
+    "timestamp": "2026-09-06T18:15:32.265Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 7: Pay Equity & Level Compensation Matrix",
+    "recordCount": 5,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532244",
+    "timestamp": "2026-09-06T18:15:32.244Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 6: CTC Breakup & Cost Analysis",
+    "recordCount": 5,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532242",
+    "timestamp": "2026-09-06T18:15:32.242Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 5: Source Effectiveness & Channel ROI",
+    "recordCount": 6,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532239",
+    "timestamp": "2026-09-06T18:15:32.239Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 4: Recruitment Funnel & TAT",
+    "recordCount": 92,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532236",
+    "timestamp": "2026-09-06T18:15:32.236Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 3: Diversity & Inclusion Snapshot",
+    "recordCount": 524,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532231",
+    "timestamp": "2026-09-06T18:15:32.231Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 2: Attrition Analysis",
+    "recordCount": 76,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-532221",
+    "timestamp": "2026-09-06T18:15:32.221Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 1: Headcount Trend & Movement",
+    "recordCount": 600,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-001",
+    "timestamp": "2026-06-30T10:14:22Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_CSV",
+    "target": "Report 1: Headcount Trend & Movement",
+    "recordCount": 600,
+    "ip": "10.0.4.12",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-002",
+    "timestamp": "2026-06-30T11:45:09Z",
+    "role": "hrbp",
+    "action": "QUERY_BUILDER",
+    "target": "Custom Sales Compensation Projection",
+    "recordCount": 124,
+    "ip": "10.0.12.88",
+    "status": "SUCCESS"
+  }
+]

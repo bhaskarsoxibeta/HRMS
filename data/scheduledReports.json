@@ -1,0 +1,33 @@
+[
+  {
+    "id": "SCHED-2333",
+    "name": "Daily Attendance Digest",
+    "reportId": "custom",
+    "frequency": "Daily (08:00 AM)",
+    "format": "CSV",
+    "recipients": "ops-leads@company.com",
+    "lastRun": "Pending First Execution",
+    "status": "Active",
+    "createdAt": "2026-09-06T18:15:32.333Z"
+  },
+  {
+    "id": "SCHED-01",
+    "name": "Weekly CXO Headcount & Attrition Digest",
+    "reportId": "1",
+    "frequency": "Weekly (Mondays 08:00 AM)",
+    "format": "CSV",
+    "recipients": "cxo-office@company.com, chro@company.com",
+    "lastRun": "2026-06-29 08:00 AM",
+    "status": "Active"
+  },
+  {
+    "id": "SCHED-02",
+    "name": "Monthly Departmental Leave Liability Accrual",
+    "reportId": "8",
+    "frequency": "Monthly (1st of month)",
+    "format": "CSV",
+    "recipients": "finance-controllers@company.com, hrbp-lead@company.com",
+    "lastRun": "2026-06-01 06:00 AM",
+    "status": "Active"
+  }
+]

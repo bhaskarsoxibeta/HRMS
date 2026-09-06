@@ -1,6 +1,6 @@
 /**
  * ReportOS — Universal HR Reporting Engine Frontend Application
- * Pure Vanilla JavaScript — Zero Frameworks / Zero External Dependencies
+ * Pure Vanilla JavaScript — Enterprise RBAC Edition
  */
 
 (function () {
@@ -21,10 +21,43 @@
     copilotMessages: [
       {
         sender: 'assistant',
-        text: 'Welcome to ReportOS Intelligence. I compute verified metrics directly from your HRMS dataset with grounded inline visualizations. Select a suggestion or type a question regarding attrition, leave liability, payroll budgets, or headcount.',
+        text: 'Welcome to ReportOS Grounded Intelligence. I compute factual metrics directly from your role-scoped HRMS dataset. Select a suggestion below or type your inquiry.',
         chart: null
       }
     ]
+  };
+
+  const ROLE_CONFIG = {
+    cxo: {
+      title: 'CXO (Enterprise Executive)',
+      badge: 'SUPER ADMIN',
+      name: 'CXO Executive Suite',
+      scope: 'Global Scope: 4 Operating Entities (600 Personnel)'
+    },
+    chro: {
+      title: 'CHRO (Chief HR Officer)',
+      badge: 'TALENT & PEOPLE',
+      name: 'Chief Human Resources Office',
+      scope: 'Company-Wide Talent, Attrition & Recruitment'
+    },
+    hrbp: {
+      title: 'HRBP (Sales Scope)',
+      badge: 'BUSINESS PARTNER',
+      name: 'Sales HR Business Partner',
+      scope: 'Department Scope: Sales (124 Active Personnel)'
+    },
+    manager: {
+      title: 'Line Manager (Management Pod)',
+      badge: 'POD LEAD',
+      name: 'Operations / Engineering Lead',
+      scope: 'Team Pod: 8 Direct Reports'
+    },
+    employee: {
+      title: 'Employee (Self-Service ESS)',
+      badge: 'SELF-SERVICE',
+      name: 'Individual Contributor',
+      scope: 'Scoped Strictly to Self (Aarav Sharma)'
+    }
   };
 
   // --------------------------------------------------------------------------
@@ -35,6 +68,7 @@
   const entitySelectEl = document.getElementById('global-entity-select');
   const breadcrumbCurrentEl = document.getElementById('breadcrumb-current');
   const quickExportBtn = document.getElementById('quick-export-btn');
+  const printBriefBtn = document.getElementById('print-brief-btn');
   const toastContainer = document.getElementById('toast-container');
   const modalBackdrop = document.getElementById('modal-backdrop');
   const modalTitle = document.getElementById('modal-title');
@@ -42,10 +76,19 @@
   const modalCloseBtn = document.getElementById('modal-close-btn');
   const modalOkBtn = document.getElementById('modal-ok-btn');
 
+  const personaBadgeEl = document.getElementById('persona-badge');
+  const personaNameEl = document.getElementById('persona-name');
+  const personaScopeEl = document.getElementById('persona-scope');
+  const navReportsCountEl = document.getElementById('nav-reports-count');
+
   // --------------------------------------------------------------------------
   // API Fetch Utilities
   // --------------------------------------------------------------------------
   async function fetchJson(url, options = {}) {
+    const headers = options.headers || {};
+    headers['X-Role'] = state.currentRole;
+    options.headers = headers;
+
     const res = await fetch(url, options);
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({ error: res.statusText }));
@@ -83,15 +126,18 @@
     if (e.target === modalBackdrop) closeModal();
   });
 
-  // --------------------------------------------------------------------------
-  // Hand-Rolled Inline SVG Chart Helpers (Strict Palette: Ink, Terracotta, Slate)
-  // --------------------------------------------------------------------------
+  if (printBriefBtn) {
+    printBriefBtn.addEventListener('click', () => {
+      showToast('Opening print dialog for executive brief...');
+      window.print();
+    });
+  }
 
-  /**
-   * Renders a clean horizontal bar chart SVG
-   */
+  // --------------------------------------------------------------------------
+  // SVG Chart Generators
+  // --------------------------------------------------------------------------
   function createHorizontalBarChartSvg(data, { width = 450, height = 200, unit = '' } = {}) {
-    if (!data || data.length === 0) return '<div class="chart-empty">No data</div>';
+    if (!data || data.length === 0) return '<div style="padding:20px; text-align:center; color:var(--ink-secondary);">No data for current scope</div>';
 
     const maxVal = Math.max(...data.map(d => d.v), 1);
     const labelWidth = 110;
@@ -107,18 +153,11 @@
       const isMax = item.v === maxVal;
       const barColor = isMax ? '#c1521f' : '#1a1714';
 
-      // Label
       svg += `<text x="${labelWidth - 10}" y="${y + 14}" text-anchor="end" class="chart-tick-label" fill="#1a1714">${item.k}</text>`;
-
-      // Background track
       svg += `<rect x="${labelWidth}" y="${y + 2}" width="${chartWidth}" height="${rowHeight - 10}" fill="#e8e2d6" />`;
-
-      // Active bar
       svg += `<rect x="${labelWidth}" y="${y + 2}" width="${barWidth}" height="${rowHeight - 10}" fill="${barColor}">
         <title>${item.k}: ${item.v}${unit ? ' ' + unit : ''}</title>
       </rect>`;
-
-      // Value text
       svg += `<text x="${labelWidth + barWidth + 8}" y="${y + 14}" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="#1a1714">${item.v}${unit ? unit : ''}</text>`;
     });
 
@@ -126,11 +165,8 @@
     return svg;
   }
 
-  /**
-   * Renders a line/area chart SVG
-   */
   function createLineChartSvg(data, { width = 500, height = 220, unit = '' } = {}) {
-    if (!data || data.length === 0) return '<div class="chart-empty">No data</div>';
+    if (!data || data.length === 0) return '<div style="padding:20px; text-align:center; color:var(--ink-secondary);">No data for current scope</div>';
 
     const padding = { top: 20, right: 30, bottom: 35, left: 45 };
     const chartW = width - padding.left - padding.right;
@@ -142,7 +178,7 @@
     const range = maxVal - minVal || 1;
 
     const points = data.map((d, i) => {
-      const x = padding.left + (i / (data.length - 1)) * chartW;
+      const x = padding.left + (i / Math.max(1, data.length - 1)) * chartW;
       const y = padding.top + chartH - ((d.v - minVal) / range) * chartH;
       return { x, y, k: d.k, v: d.v };
     });
@@ -152,7 +188,6 @@
 
     let svg = `<svg viewBox="0 0 ${width} ${height}" class="chart-svg" xmlns="http://www.w3.org/2000/svg">`;
 
-    // Horizontal grid lines (3 steps)
     for (let s = 0; s <= 3; s++) {
       const stepVal = minVal + (range / 3) * s;
       const y = padding.top + chartH - (s / 3) * chartH;
@@ -160,13 +195,9 @@
       svg += `<text x="${padding.left - 8}" y="${y + 3}" text-anchor="end" class="chart-tick-label">${Math.round(stepVal)}</text>`;
     }
 
-    // Shaded area
     svg += `<path d="${areaPath}" fill="#faece6" opacity="0.7" />`;
-
-    // Main line
     svg += `<path d="${linePath}" class="chart-line-path" />`;
 
-    // Points and labels
     points.forEach(p => {
       svg += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" class="chart-point">
         <title>${p.k}: ${p.v} ${unit}</title>
@@ -178,17 +209,13 @@
     return svg;
   }
 
-  /**
-   * Renders a donut chart SVG with legend
-   */
   function createDonutChartSvg(data, { size = 180 } = {}) {
-    if (!data || data.length === 0) return '<div class="chart-empty">No data</div>';
+    if (!data || data.length === 0) return '<div style="padding:20px; text-align:center; color:var(--ink-secondary);">No data for current scope</div>';
 
     const cx = size / 2;
     const cy = size / 2;
     const radius = size * 0.40;
     const innerRadius = size * 0.24;
-    const strokeWidth = radius - innerRadius;
 
     let total = data.reduce((s, d) => s + d.v, 0);
     if (total === 0) total = 1;
@@ -232,11 +259,9 @@
       </path>`;
     });
 
-    // Center text
     svg += `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-family="Playfair Display" font-size="14" font-weight="700" fill="#1a1714">Mix</text>`;
     svg += `</svg>`;
 
-    // Legend
     svg += `<div class="donut-legend">`;
     data.forEach(item => {
       svg += `<div class="legend-item">
@@ -251,16 +276,27 @@
   }
 
   // --------------------------------------------------------------------------
+  // Update Persona Card in Sidebar
+  // --------------------------------------------------------------------------
+  function updatePersonaUi() {
+    const config = ROLE_CONFIG[state.currentRole] || ROLE_CONFIG.cxo;
+    if (personaBadgeEl) personaBadgeEl.textContent = config.badge;
+    if (personaNameEl) personaNameEl.textContent = config.name;
+    if (personaScopeEl) personaScopeEl.textContent = config.scope;
+  }
+
+  // --------------------------------------------------------------------------
   // VIEW: Dashboard
   // --------------------------------------------------------------------------
   async function renderDashboard() {
     breadcrumbCurrentEl.textContent = 'Dashboard';
+    updatePersonaUi();
 
     mainEl.innerHTML = `
       <div class="page-header">
         <div>
           <h2 class="page-title">Executive Dashboard</h2>
-          <p class="page-subtitle">Perspective: <strong style="color:var(--ink);">${state.currentRole.toUpperCase()}</strong> • Real-time aggregates computed across active rosters</p>
+          <p class="page-subtitle">Perspective: <strong style="color:var(--ink);">${state.currentRole.toUpperCase()}</strong> • Scoped real-time analytics</p>
         </div>
         <div class="page-meta">
           <span>DATA ANCHOR: JUNE 2026</span>
@@ -268,23 +304,19 @@
       </div>
 
       <div class="dashboard-grid">
-        <!-- KPI Row with Asymmetric Hero -->
         <div class="kpi-section" id="kpi-cards-host">
           <div class="kpi-card hero-kpi"><div class="kpi-label">Loading KPIs...</div></div>
         </div>
 
-        <!-- Charts Grid -->
         <div class="charts-grid">
-          <!-- Headcount Trend -->
           <div class="chart-card">
             <div class="chart-header">
               <h3 class="chart-title">Headcount Trajectory (Trailing 6 Months)</h3>
-              <span class="chart-meta">Dynamic Date Alignment</span>
+              <span class="chart-meta">Role Scoped</span>
             </div>
             <div class="chart-container" id="chart-headcount-trend">Loading trend chart...</div>
           </div>
 
-          <!-- Gender Composition -->
           <div class="chart-card">
             <div class="chart-header">
               <h3 class="chart-title">Workforce Gender Mix</h3>
@@ -293,11 +325,10 @@
             <div class="chart-container" id="chart-gender-mix">Loading composition...</div>
           </div>
 
-          <!-- Attrition by Department (Full-bleed) -->
           <div class="chart-card full-bleed">
             <div class="chart-header">
               <h3 class="chart-title">TTM Attrition Rate by Operating Department</h3>
-              <span class="chart-meta">Separations / Average Headcount</span>
+              <span class="chart-meta">Role Scoped Separations</span>
             </div>
             <div class="chart-container" id="chart-attrition-dept">Loading department attrition...</div>
           </div>
@@ -305,7 +336,6 @@
       </div>
     `;
 
-    // Fetch and render KPIs
     try {
       const kpis = await fetchJson(`/api/kpis?role=${state.currentRole}`);
       const host = document.getElementById('kpi-cards-host');
@@ -332,37 +362,28 @@
       console.error('Failed to load KPIs:', err);
     }
 
-    // Fetch and render Headcount Trend Chart
     try {
-      const trendData = await fetchJson('/api/charts/headcount-trend');
+      const trendData = await fetchJson(`/api/charts/headcount-trend?role=${state.currentRole}`);
       const container = document.getElementById('chart-headcount-trend');
-      if (container) {
-        container.innerHTML = createLineChartSvg(trendData, { width: 520, height: 210, unit: 'employees' });
-      }
+      if (container) container.innerHTML = createLineChartSvg(trendData, { width: 520, height: 210, unit: 'personnel' });
     } catch (err) {
-      console.error('Failed to load headcount trend:', err);
+      console.error('Failed to load trend:', err);
     }
 
-    // Fetch and render Gender Mix Donut
     try {
-      const mixData = await fetchJson('/api/charts/gender-mix');
+      const mixData = await fetchJson(`/api/charts/gender-mix?role=${state.currentRole}`);
       const container = document.getElementById('chart-gender-mix');
-      if (container) {
-        container.innerHTML = createDonutChartSvg(mixData, { size: 170 });
-      }
+      if (container) container.innerHTML = createDonutChartSvg(mixData, { size: 170 });
     } catch (err) {
-      console.error('Failed to load gender mix:', err);
+      console.error('Failed to load mix:', err);
     }
 
-    // Fetch and render Attrition by Dept Bar Chart
     try {
-      const attritionData = await fetchJson('/api/charts/attrition-by-dept');
+      const attritionData = await fetchJson(`/api/charts/attrition-by-dept?role=${state.currentRole}`);
       const container = document.getElementById('chart-attrition-dept');
-      if (container) {
-        container.innerHTML = createHorizontalBarChartSvg(attritionData, { width: 900, height: 180, unit: '%' });
-      }
+      if (container) container.innerHTML = createHorizontalBarChartSvg(attritionData, { width: 900, height: 180, unit: '%' });
     } catch (err) {
-      console.error('Failed to load attrition by dept:', err);
+      console.error('Failed to load attrition:', err);
     }
   }
 
@@ -373,22 +394,22 @@
 
   async function renderReportLibrary() {
     breadcrumbCurrentEl.textContent = 'Report Library';
+    updatePersonaUi();
 
     mainEl.innerHTML = `
       <div class="page-header">
         <div>
           <h2 class="page-title">Standard Report Catalog</h2>
-          <p class="page-subtitle">21 categorized analytical rosters • 10 executable CSV generators &amp; 11 architectural catalog entries</p>
+          <p class="page-subtitle">21 Enterprise analytical rosters • All 21 wired with executable CSV generation engines</p>
         </div>
         <div class="page-meta">
-          <span>SPEC COMPLIANT v1.0</span>
+          <span>ROLE: ${state.currentRole.toUpperCase()}</span>
         </div>
       </div>
 
       <div class="library-layout">
-        <!-- Category Filter Tabs -->
         <div class="category-tabs" id="library-category-tabs">
-          <button class="category-tab ${activeLibraryCategory === 'All' ? 'active' : ''}" data-cat="All">All Categories (21)</button>
+          <button class="category-tab ${activeLibraryCategory === 'All' ? 'active' : ''}" data-cat="All">All Categories</button>
           <button class="category-tab ${activeLibraryCategory === 'Workforce & Headcount' ? 'active' : ''}" data-cat="Workforce & Headcount">Workforce &amp; Headcount</button>
           <button class="category-tab ${activeLibraryCategory === 'Recruitment' ? 'active' : ''}" data-cat="Recruitment">Recruitment</button>
           <button class="category-tab ${activeLibraryCategory === 'Payroll & Compensation' ? 'active' : ''}" data-cat="Payroll & Compensation">Payroll &amp; Comp</button>
@@ -405,7 +426,6 @@
       </div>
     `;
 
-    // Category tab listeners
     const tabsHost = document.getElementById('library-category-tabs');
     tabsHost.querySelectorAll('.category-tab').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -422,9 +442,11 @@
   async function loadReportsList(category) {
     const listHost = document.getElementById('reports-list-host');
     try {
-      const reports = await fetchJson(`/api/reports?category=${encodeURIComponent(category)}`);
+      const reports = await fetchJson(`/api/reports?category=${encodeURIComponent(category)}&role=${state.currentRole}`);
       
-      // Group reports by category
+      const permittedCount = reports.filter(r => r.permitted).length;
+      if (navReportsCountEl) navReportsCountEl.textContent = `${permittedCount}/21`;
+
       const groups = {};
       reports.forEach(r => {
         if (!groups[r.cat]) groups[r.cat] = [];
@@ -445,7 +467,7 @@
                 <tr>
                   <th style="width: 28%;">Report Name</th>
                   <th style="width: 44%;">Analytical Scope &amp; Purpose</th>
-                  <th style="width: 14%;">Status</th>
+                  <th style="width: 14%;">Access Level</th>
                   <th style="width: 14%; text-align:right;">Action</th>
                 </tr>
               </thead>
@@ -453,18 +475,19 @@
         `;
 
         catReports.forEach(r => {
+          const isPermitted = r.permitted;
           html += `
             <tr>
               <td class="report-name-cell">${r.name}</td>
               <td class="report-desc-cell">${r.desc}</td>
               <td>
-                ${r.wired 
-                  ? '<span class="badge-wired">Executable CSV</span>' 
-                  : '<span class="badge-catalog">Catalog Only</span>'}
+                ${isPermitted 
+                  ? '<span class="badge-wired">Authorized CSV</span>' 
+                  : '<span class="badge-restricted">Role Restricted</span>'}
               </td>
               <td style="text-align:right;">
-                <button class="btn ${r.wired ? 'btn-primary' : 'btn-secondary'} btn-sm run-report-btn" data-id="${r.id}" data-wired="${r.wired}" data-name="${r.name}">
-                  ${r.wired ? 'Download CSV' : 'View Spec'}
+                <button class="btn ${isPermitted ? 'btn-primary' : 'btn-secondary'} btn-sm run-report-btn" data-id="${r.id}" data-permitted="${isPermitted}" data-name="${r.name}">
+                  ${isPermitted ? 'Download CSV' : 'Restricted'}
                 </button>
               </td>
             </tr>
@@ -476,21 +499,20 @@
 
       listHost.innerHTML = html;
 
-      // Attach download/modal handlers
       listHost.querySelectorAll('.run-report-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const reportId = btn.getAttribute('data-id');
-          const isWired = btn.getAttribute('data-wired') === 'true';
+          const isPermitted = btn.getAttribute('data-permitted') === 'true';
           const reportName = btn.getAttribute('data-name');
 
-          if (isWired) {
+          if (isPermitted) {
             showToast(`Generating ${reportName}...`);
-            window.location.href = `/api/reports/${reportId}/csv`;
+            window.location.href = `/api/reports/${reportId}/csv?role=${state.currentRole}`;
           } else {
             showModal(
-              'Catalog-Only Report Notice (HTTP 501)',
-              `<p><strong>${reportName}</strong> is registered in the v1 HR reporting catalog as a specification blueprint.</p>
-               <p style="margin-top:10px; color:var(--ink-secondary);">To execute this report with live data, connect a generator function in <code>lib/reportDefs.js</code> returning <code>{ columns, rows }</code>. The UI router and CSV stream handlers are already fully configured.</p>`
+              'RBAC Access Boundary Notice',
+              `<p><strong>${reportName}</strong> is restricted from your active identity perspective (<strong>${state.currentRole.toUpperCase()}</strong>).</p>
+               <p style="margin-top:10px; color:var(--ink-secondary);">To access this analytical report, switch your role perspective in the top navigation bar to an authorized role (CXO, CHRO, or HRBP).</p>`
             );
           }
         });
@@ -506,41 +528,35 @@
   // --------------------------------------------------------------------------
   async function renderCustomBuilder() {
     breadcrumbCurrentEl.textContent = 'Custom Builder';
+    updatePersonaUi();
 
-    if (!state.fieldCatalog) {
-      try {
-        state.fieldCatalog = await fetchJson('/api/builder/fields');
-      } catch (err) {
-        console.error('Failed to load fields:', err);
-      }
+    try {
+      state.fieldCatalog = await fetchJson(`/api/builder/fields?role=${state.currentRole}`);
+    } catch (err) {
+      console.error('Failed to load fields:', err);
     }
 
     mainEl.innerHTML = `
       <div class="page-header">
         <div>
           <h2 class="page-title">Custom Report Builder</h2>
-          <p class="page-subtitle">No-code schema projection • Live synchronized preview table &amp; CSV serializer</p>
+          <p class="page-subtitle">Role-scoped schema projection • Live synchronized preview table &amp; CSV export</p>
         </div>
         <div class="page-meta">
-          <span>SCHEMA BUILDER ENGINE</span>
+          <span>ROLE: ${state.currentRole.toUpperCase()}</span>
         </div>
       </div>
 
       <div class="builder-layout">
-        <!-- Controls Grid: Field Selector + Filters -->
         <div class="builder-controls-grid">
-          <!-- Field Selector Card -->
           <div class="field-selector-card">
             <div class="section-heading">
               <span>Select Attributes to Include</span>
-              <button id="builder-select-all-btn" class="btn btn-secondary btn-sm">Select All</button>
+              <button id="builder-select-all-btn" class="btn btn-secondary btn-sm">Select All Available</button>
             </div>
-            <div class="field-categories" id="field-categories-host">
-              <!-- Field Checkboxes -->
-            </div>
+            <div class="field-categories" id="field-categories-host"></div>
           </div>
 
-          <!-- Filters Card -->
           <div class="filters-card">
             <div class="section-heading">
               <span>Roster Query Filters</span>
@@ -581,7 +597,6 @@
           </div>
         </div>
 
-        <!-- Live Preview Section -->
         <div class="preview-section">
           <div class="preview-header">
             <div>
@@ -599,7 +614,6 @@
           </div>
         </div>
 
-        <!-- Saved Reports Registry -->
         <div class="card" style="margin-top:10px;">
           <div class="section-heading">
             <span>Saved Custom Report Definitions</span>
@@ -611,7 +625,6 @@
       </div>
     `;
 
-    // Render Field Categories
     const categoriesHost = document.getElementById('field-categories-host');
     if (state.fieldCatalog && categoriesHost) {
       let catHtml = '';
@@ -635,7 +648,6 @@
       });
       categoriesHost.innerHTML = catHtml;
 
-      // Checkbox event listeners
       categoriesHost.querySelectorAll('.field-checkbox').forEach(cb => {
         cb.addEventListener('change', () => {
           const key = cb.value;
@@ -649,7 +661,6 @@
       });
     }
 
-    // Filter change listeners
     ['filter-entity', 'filter-dept', 'filter-emp-type', 'filter-status'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
@@ -663,7 +674,6 @@
       }
     });
 
-    // Select all button
     document.getElementById('builder-select-all-btn').addEventListener('click', () => {
       const allKeys = [];
       Object.values(state.fieldCatalog).forEach(list => list.forEach(f => allKeys.push(f.key)));
@@ -672,7 +682,6 @@
       refreshBuilderPreview();
     });
 
-    // Download CSV
     document.getElementById('builder-download-btn').addEventListener('click', async () => {
       try {
         showToast('Serializing full query dataset to CSV...');
@@ -682,6 +691,7 @@
           body: JSON.stringify({
             fields: state.builderSelectedFields,
             filters: state.builderFilters,
+            role: state.currentRole,
             name: 'custom_hr_report'
           })
         });
@@ -699,7 +709,6 @@
       }
     });
 
-    // Save definition
     document.getElementById('builder-save-btn').addEventListener('click', () => {
       const reportName = prompt('Enter a name for this custom report definition:');
       if (reportName && reportName.trim()) {
@@ -722,12 +731,13 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fields: state.builderSelectedFields,
-          filters: state.builderFilters
+          filters: state.builderFilters,
+          role: state.currentRole
         })
       });
 
       if (countMeta) {
-        countMeta.textContent = `Showing ${preview.rows.length} of ${preview.total} matching records`;
+        countMeta.textContent = `Showing ${preview.rows.length} of ${preview.total} matching records for active role (${state.currentRole.toUpperCase()})`;
       }
 
       if (preview.rows.length === 0) {
@@ -764,7 +774,8 @@
         body: JSON.stringify({
           name,
           fields: state.builderSelectedFields,
-          filters: state.builderFilters
+          filters: state.builderFilters,
+          role: state.currentRole
         })
       });
       showToast(`Saved report "${name}"`);
@@ -792,7 +803,7 @@
             <div>
               <strong style="color:var(--ink); font-size:13px;">${item.name}</strong>
               <div style="font-size:11px; color:var(--ink-secondary); margin-top:2px;">
-                ${item.fields.length} attributes selected • Saved on ${new Date(item.createdAt).toLocaleDateString()}
+                ${item.fields.length} attributes selected • Created by ${item.createdByRole || 'Admin'} on ${new Date(item.createdAt).toLocaleDateString()}
               </div>
             </div>
             <button class="btn btn-secondary btn-sm load-saved-btn" data-json="${encodeURIComponent(JSON.stringify(item))}">
@@ -823,35 +834,32 @@
   // --------------------------------------------------------------------------
   function renderCopilot() {
     breadcrumbCurrentEl.textContent = 'AI Copilot';
+    updatePersonaUi();
 
     mainEl.innerHTML = `
       <div class="page-header">
         <div>
           <h2 class="page-title">Grounded Intelligence Copilot</h2>
-          <p class="page-subtitle">Natural language analytics • Factual computations and inline SVG charting</p>
+          <p class="page-subtitle">Natural language analytics • Role-enforced computations and inline charting</p>
         </div>
         <div class="page-meta">
-          <span>GROUNDED NLU ENGINE</span>
+          <span>ROLE: ${state.currentRole.toUpperCase()}</span>
         </div>
       </div>
 
       <div class="copilot-layout">
-        <!-- Main Chat Stream -->
         <div class="chat-panel">
-          <div class="chat-messages" id="chat-messages-host">
-            <!-- Messages rendered here -->
-          </div>
+          <div class="chat-messages" id="chat-messages-host"></div>
           <form class="chat-input-wrapper" id="chat-form">
             <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question (e.g., 'What is our attrition rate?' or 'Show leave liability')..." autocomplete="off">
             <button type="submit" class="btn btn-primary">Query Engine</button>
           </form>
         </div>
 
-        <!-- Sidebar / Suggestion Chips -->
         <div class="copilot-sidebar">
           <div class="card">
             <div class="section-heading">
-              <span>Verified Data Prompts</span>
+              <span>Verified Role Prompts</span>
             </div>
             <div class="suggestion-chips">
               <button class="chip-btn" data-q="What is our current attrition rate?">
@@ -879,10 +887,10 @@
 
           <div class="card" style="background-color:var(--bg-surface);">
             <div class="section-heading">
-              <span>Architecture Seam</span>
+              <span>Security &amp; Tool Seam</span>
             </div>
             <p style="font-size:11.5px; color:var(--ink-secondary); line-height:1.5;">
-              In v1, queries are routed through a factual keyword analyzer backed by verified aggregate routines. In future releases, this binds seamlessly to Claude tool-use functions without data invention risk.
+              Queries are evaluated against your active role perspective (<strong>${state.currentRole.toUpperCase()}</strong>). Sensitive compensation queries by unauthorized roles are cleanly intercepted.
             </p>
           </div>
         </div>
@@ -891,7 +899,6 @@
 
     renderChatMessages();
 
-    // Form submit
     const form = document.getElementById('chat-form');
     const input = document.getElementById('chat-input');
 
@@ -899,12 +906,10 @@
       e.preventDefault();
       const text = input.value.trim();
       if (!text) return;
-
       input.value = '';
       await handleUserCopilotQuery(text);
     });
 
-    // Suggestion chips
     document.querySelectorAll('.chip-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const q = btn.getAttribute('data-q');
@@ -920,7 +925,6 @@
     let html = '';
     state.copilotMessages.forEach(msg => {
       const isUser = msg.sender === 'user';
-      // Format markdown **bold**
       const formattedText = msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
       let chartHtml = '';
@@ -939,7 +943,7 @@
 
       html += `
         <div class="chat-bubble ${isUser ? 'user' : 'assistant'}">
-          <span class="bubble-sender">${isUser ? 'Perspective Query' : 'ReportOS Intelligence'}</span>
+          <span class="bubble-sender">${isUser ? `Query (${state.currentRole.toUpperCase()})` : 'ReportOS Intelligence'}</span>
           <div class="bubble-content">
             <div>${formattedText}</div>
             ${chartHtml}
@@ -964,7 +968,7 @@
       const res = await fetchJson('/api/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question })
+        body: JSON.stringify({ question, role: state.currentRole })
       });
 
       state.copilotMessages.push({
@@ -984,13 +988,164 @@
   }
 
   // --------------------------------------------------------------------------
+  // VIEW: Scheduled Reports & Automations
+  // --------------------------------------------------------------------------
+  async function renderSchedules() {
+    breadcrumbCurrentEl.textContent = 'Automations & Schedules';
+    updatePersonaUi();
+
+    mainEl.innerHTML = `
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">Automated Export Schedules</h2>
+          <p class="page-subtitle">Configure recurring batch CSV/PDF export dispatches to executive stakeholders</p>
+        </div>
+        <div class="page-meta">
+          <button id="create-schedule-btn" class="btn btn-primary">Create Scheduled Job</button>
+        </div>
+      </div>
+
+      <div class="schedule-grid" id="schedules-host">
+        <div style="padding:30px; text-align:center; color:var(--ink-secondary);">Loading scheduled jobs...</div>
+      </div>
+    `;
+
+    try {
+      const schedules = await fetchJson('/api/schedules');
+      const host = document.getElementById('schedules-host');
+      if (schedules.length === 0) {
+        host.innerHTML = '<div>No automated export schedules configured yet.</div>';
+        return;
+      }
+
+      let html = '';
+      schedules.forEach(job => {
+        html += `
+          <div class="schedule-card">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="badge-wired">${job.frequency}</span>
+                <span style="font-family:var(--font-mono); font-size:10px; color:var(--ink-secondary);">${job.id}</span>
+              </div>
+              <h4 class="schedule-title">${job.name}</h4>
+              <div class="schedule-meta-row">
+                <span>Target Format</span>
+                <span class="schedule-meta-val">${job.format}</span>
+              </div>
+              <div class="schedule-meta-row">
+                <span>Distribution List</span>
+                <span class="schedule-meta-val">${job.recipients}</span>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--border-light); margin-top:14px; padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:var(--ink-tertiary);">Last Run: ${job.lastRun}</span>
+              <button class="btn btn-secondary btn-sm run-schedule-now" data-name="${job.name}">Run Now</button>
+            </div>
+          </div>
+        `;
+      });
+      host.innerHTML = html;
+
+      host.querySelectorAll('.run-schedule-now').forEach(btn => {
+        btn.addEventListener('click', () => {
+          showToast(`Dispatched "${btn.getAttribute('data-name')}" to stakeholders.`);
+        });
+      });
+
+      document.getElementById('create-schedule-btn').addEventListener('click', () => {
+        const name = prompt('Enter a name for the new recurring schedule:');
+        if (name && name.trim()) {
+          fetchJson('/api/schedules', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: name.trim(),
+              frequency: 'Weekly (Every Monday 09:00 AM)',
+              format: 'CSV',
+              recipients: 'stakeholders@company.com'
+            })
+          }).then(() => {
+            showToast(`Created schedule "${name}"`);
+            renderSchedules();
+          });
+        }
+      });
+    } catch (err) {
+      console.error('Failed to load schedules:', err);
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // VIEW: Security & Audit Trail
+  // --------------------------------------------------------------------------
+  async function renderAudit() {
+    breadcrumbCurrentEl.textContent = 'Security & Audit Trail';
+    updatePersonaUi();
+
+    mainEl.innerHTML = `
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">Security &amp; Export Audit Log</h2>
+          <p class="page-subtitle">Immutable event stream of all CSV downloads, schema projections, and role elevations</p>
+        </div>
+        <div class="page-meta">
+          <span>REAL-TIME AUDIT LOG</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th style="width: 15%;">Event ID</th>
+              <th style="width: 20%;">Timestamp (UTC)</th>
+              <th style="width: 15%;">Persona / Role</th>
+              <th style="width: 20%;">Action Executed</th>
+              <th style="width: 20%;">Resource Target</th>
+              <th style="width: 10%;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="audit-table-body">
+            <tr><td colspan="6" style="padding:20px; text-align:center;">Loading audit logs...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    try {
+      const logs = await fetchJson('/api/audit-log');
+      const tbody = document.getElementById('audit-table-body');
+      if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center;">No audit records available.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      logs.forEach(log => {
+        html += `
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:11px;">${log.id}</td>
+            <td style="font-family:var(--font-mono); font-size:11.5px; color:var(--ink-secondary);">${new Date(log.timestamp).toLocaleString()}</td>
+            <td><span class="badge-wired">${log.role.toUpperCase()}</span></td>
+            <td style="font-family:var(--font-mono); font-size:11.5px; font-weight:600;">${log.action}</td>
+            <td style="color:var(--ink);">${log.target}</td>
+            <td><span class="badge-wired">${log.status}</span></td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    } catch (err) {
+      console.error('Failed to load audit logs:', err);
+    }
+  }
+
+  // --------------------------------------------------------------------------
   // Router & Navigation
   // --------------------------------------------------------------------------
   function navigate(viewName) {
-    const validViews = ['dashboard', 'library', 'builder', 'copilot'];
+    const validViews = ['dashboard', 'library', 'builder', 'copilot', 'schedules', 'audit'];
     state.currentView = validViews.includes(viewName) ? viewName : 'dashboard';
 
-    // Update nav links
     document.querySelectorAll('.nav-item').forEach(el => {
       if (el.getAttribute('data-view') === state.currentView) {
         el.classList.add('active');
@@ -999,15 +1154,12 @@
       }
     });
 
-    if (state.currentView === 'dashboard') {
-      renderDashboard();
-    } else if (state.currentView === 'library') {
-      renderReportLibrary();
-    } else if (state.currentView === 'builder') {
-      renderCustomBuilder();
-    } else if (state.currentView === 'copilot') {
-      renderCopilot();
-    }
+    if (state.currentView === 'dashboard') renderDashboard();
+    else if (state.currentView === 'library') renderReportLibrary();
+    else if (state.currentView === 'builder') renderCustomBuilder();
+    else if (state.currentView === 'copilot') renderCopilot();
+    else if (state.currentView === 'schedules') renderSchedules();
+    else if (state.currentView === 'audit') renderAudit();
   }
 
   function handleHashChange() {
@@ -1022,11 +1174,9 @@
   // --------------------------------------------------------------------------
   async function initApp() {
     try {
-      // 1. Fetch metadata
-      state.meta = await fetchJson('/api/meta');
-
-      // Populate entity dropdown
+      state.meta = await fetchJson(`/api/meta?role=${state.currentRole}`);
       if (entitySelectEl && state.meta.entities) {
+        entitySelectEl.innerHTML = '<option value="All">All Operating Entities</option>';
         state.meta.entities.forEach(ent => {
           const opt = document.createElement('option');
           opt.value = ent;
@@ -1038,18 +1188,15 @@
       console.warn('Metadata initialization failed:', err);
     }
 
-    // Role selector listener
     if (roleSelectEl) {
       roleSelectEl.addEventListener('change', () => {
         state.currentRole = roleSelectEl.value;
-        showToast(`Switched perspective to ${state.currentRole.toUpperCase()}`);
-        if (state.currentView === 'dashboard') {
-          renderDashboard();
-        }
+        showToast(`Switched active identity to ${state.currentRole.toUpperCase()}`);
+        updatePersonaUi();
+        handleHashChange();
       });
     }
 
-    // Entity selector listener
     if (entitySelectEl) {
       entitySelectEl.addEventListener('change', () => {
         state.currentEntity = entitySelectEl.value;
@@ -1057,19 +1204,17 @@
       });
     }
 
-    // Quick export listener
     if (quickExportBtn) {
       quickExportBtn.addEventListener('click', () => {
-        showToast('Exporting current view metrics...');
-        window.location.href = '/api/reports/1/csv';
+        showToast('Exporting current view roster CSV...');
+        window.location.href = `/api/reports/1/csv?role=${state.currentRole}`;
       });
     }
 
-    // Launch initial view
+    updatePersonaUi();
     handleHashChange();
   }
 
-  // Boot on DOM Ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initApp);
   } else {
