@@ -1,0 +1,37 @@
+[
+  {
+    "dept": "Sales",
+    "actualCTC": 229473897,
+    "budgetedCTC": 234063375,
+    "varianceCTC": -4589478,
+    "variancePct": -2
+  },
+  {
+    "dept": "Ops",
+    "actualCTC": 182549638,
+    "budgetedCTC": 202995197,
+    "varianceCTC": -20445559,
+    "variancePct": -10.1
+  },
+  {
+    "dept": "Tech",
+    "actualCTC": 228684409,
+    "budgetedCTC": 201470964,
+    "varianceCTC": 27213445,
+    "variancePct": 13.5
+  },
+  {
+    "dept": "Finance",
+    "actualCTC": 202399665,
+    "budgetedCTC": 190862884,
+    "varianceCTC": 11536781,
+    "variancePct": 6
+  },
+  {
+    "dept": "HR",
+    "actualCTC": 233605183,
+    "budgetedCTC": 243883811,
+    "varianceCTC": -10278628,
+    "variancePct": -4.2
+  }
+]

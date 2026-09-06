@@ -1,0 +1,13 @@
+{
+  "name": "reportos",
+  "version": "1.0.0",
+  "description": "Universal HR Reporting Engine — zero dependencies",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["hrms", "reporting", "hr-analytics", "reportos"],
+  "author": "ReportOS",
+  "license": "MIT",
+  "dependencies": {}
+}

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "CUSTOM-1788717987158",
+    "name": "Sales Comp Roster",
+    "fields": [
+      "id",
+      "name",
+      "ctc"
+    ],
+    "filters": {
+      "dept": "Sales"
+    },
+    "createdAt": "2026-09-06T18:06:27.158Z"
+  }
+]
