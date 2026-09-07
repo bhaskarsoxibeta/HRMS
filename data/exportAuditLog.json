@@ -1,5 +1,385 @@
 [
   {
+    "id": "AUD-495461",
+    "timestamp": "2026-09-07T04:14:55.461Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-494707",
+    "timestamp": "2026-09-07T04:14:54.708Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-494225",
+    "timestamp": "2026-09-07T04:14:54.225Z",
+    "role": "cxo",
+    "action": "LOGIN_SUCCESS",
+    "target": "CEO Portal Access (ceo@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-947507",
+    "timestamp": "2026-09-07T04:05:47.507Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-918340",
+    "timestamp": "2026-09-07T04:05:18.340Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-918316",
+    "timestamp": "2026-09-07T04:05:18.316Z",
+    "role": "cxo",
+    "action": "LOGIN_SUCCESS",
+    "target": "CEO Portal Access (ceo@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-911046",
+    "timestamp": "2026-09-07T04:05:11.046Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-639550",
+    "timestamp": "2026-09-07T04:00:39.550Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-639464",
+    "timestamp": "2026-09-07T04:00:39.464Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-638912",
+    "timestamp": "2026-09-07T04:00:38.912Z",
+    "role": "cxo",
+    "action": "LOGIN_SUCCESS",
+    "target": "CEO Portal Access (ceo@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-574583",
+    "timestamp": "2026-09-07T03:59:34.583Z",
+    "role": "manager",
+    "action": "LOGIN_SUCCESS",
+    "target": "STAFF Portal Access (manager@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-465846",
+    "timestamp": "2026-09-07T03:57:45.846Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-384582",
+    "timestamp": "2026-09-07T03:56:24.582Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-375471",
+    "timestamp": "2026-09-07T03:56:15.471Z",
+    "role": "chro",
+    "action": "LOGIN_SUCCESS",
+    "target": "STAFF Portal Access (chro@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-366716",
+    "timestamp": "2026-09-07T03:56:06.717Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-366701",
+    "timestamp": "2026-09-07T03:56:06.701Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-366669",
+    "timestamp": "2026-09-07T03:56:06.669Z",
+    "role": "cxo",
+    "action": "LOGIN_SUCCESS",
+    "target": "CEO Portal Access (ceo@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-359547",
+    "timestamp": "2026-09-07T03:55:59.547Z",
+    "role": "chro",
+    "action": "LOGIN_SUCCESS",
+    "target": "STAFF Portal Access (chro@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-334116",
+    "timestamp": "2026-09-07T03:55:34.116Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-334035",
+    "timestamp": "2026-09-07T03:55:34.035Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-333978",
+    "timestamp": "2026-09-07T03:55:33.978Z",
+    "role": "cxo",
+    "action": "LOGIN_SUCCESS",
+    "target": "CEO Portal Access (ceo@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-286726",
+    "timestamp": "2026-09-07T03:54:46.726Z",
+    "role": "manager",
+    "action": "LOGIN_SUCCESS",
+    "target": "STAFF Portal Access (manager@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-286725",
+    "timestamp": "2026-09-07T03:54:46.725Z",
+    "role": "cxo",
+    "action": "LOGIN_SUCCESS",
+    "target": "CEO Portal Access (ceo@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-286723",
+    "timestamp": "2026-09-07T03:54:46.723Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-218454",
+    "timestamp": "2026-09-07T03:53:38.454Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-183654",
+    "timestamp": "2026-09-07T03:53:03.654Z",
+    "role": "manager",
+    "action": "LOGIN_SUCCESS",
+    "target": "STAFF Portal Access (manager@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-183653",
+    "timestamp": "2026-09-07T03:53:03.653Z",
+    "role": "cxo",
+    "action": "LOGIN_SUCCESS",
+    "target": "CEO Portal Access (ceo@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-183651",
+    "timestamp": "2026-09-07T03:53:03.651Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-624072",
+    "timestamp": "2026-09-07T03:43:44.072Z",
+    "role": "manager",
+    "action": "LOGIN_SUCCESS",
+    "target": "STAFF Portal Access (manager@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-619235",
+    "timestamp": "2026-09-07T03:43:39.235Z",
+    "role": "cxo",
+    "action": "LOGIN_SUCCESS",
+    "target": "CEO Portal Access (ceo@soxibeta.com)",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "AUTHENTICATED"
+  },
+  {
+    "id": "AUD-298736",
+    "timestamp": "2026-09-07T03:38:18.736Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-850459",
+    "timestamp": "2026-09-07T03:30:50.459Z",
+    "role": "chro",
+    "action": "ACCESS_DENIED_CEO_MODULE",
+    "target": "CEO Executive Module",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "BLOCKED_RBAC"
+  },
+  {
+    "id": "AUD-841047",
+    "timestamp": "2026-09-07T03:30:41.048Z",
+    "role": "cxo",
+    "action": "VIEW_CEO_MODULE",
+    "target": "CEO Executive Control Suite",
+    "recordCount": 0,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-726611",
+    "timestamp": "2026-09-07T03:28:46.611Z",
+    "role": "cxo",
+    "action": "COPILOT_QUERY",
+    "target": "What is our active headcount and 6-month trend?",
+    "recordCount": 1,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-724401",
+    "timestamp": "2026-09-07T03:28:44.401Z",
+    "role": "cxo",
+    "action": "COPILOT_QUERY",
+    "target": "What is our total leave encashment liability?",
+    "recordCount": 1,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-722969",
+    "timestamp": "2026-09-07T03:28:42.969Z",
+    "role": "cxo",
+    "action": "COPILOT_QUERY",
+    "target": "Are we tracking over budget on payroll?",
+    "recordCount": 1,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-405793",
+    "timestamp": "2026-09-07T03:23:25.793Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 1: Headcount Trend & Movement",
+    "recordCount": 600,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "AUD-391484",
+    "timestamp": "2026-09-07T03:23:11.484Z",
+    "role": "cxo",
+    "action": "DOWNLOAD_REPORT_CSV",
+    "target": "Report 1: Headcount Trend & Movement",
+    "recordCount": 600,
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
     "id": "AUD-780763",
     "timestamp": "2026-09-06T18:19:40.763Z",
     "role": "cxo",

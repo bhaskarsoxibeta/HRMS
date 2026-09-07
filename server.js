@@ -24,6 +24,59 @@ const MIME_TYPES = {
   '.woff': 'font/woff'
 };
 
+const MOCK_USERS = [
+  {
+    email: 'ceo@soxibeta.com',
+    password: 'ceo2026',
+    role: 'cxo',
+    name: 'Vikramaditya Singhania',
+    title: 'CEO (Chief Executive Officer)',
+    badge: 'CHIEF EXECUTIVE',
+    portal: 'ceo',
+    scope: 'Global Enterprise Scope: 4 Operating Subsidiaries (600 FTE)'
+  },
+  {
+    email: 'chro@soxibeta.com',
+    password: 'chro2026',
+    role: 'chro',
+    name: 'Priyanka Nair',
+    title: 'CHRO (Chief HR Officer)',
+    badge: 'TALENT & PEOPLE',
+    portal: 'staff',
+    scope: 'Company-Wide Talent, Attrition & Recruitment'
+  },
+  {
+    email: 'hrbp@soxibeta.com',
+    password: 'hrbp2026',
+    role: 'hrbp',
+    name: 'Rohan Gupta',
+    title: 'HRBP (Sales Business Partner)',
+    badge: 'BUSINESS PARTNER',
+    portal: 'staff',
+    scope: 'Department Scope: Sales (124 Active Personnel)'
+  },
+  {
+    email: 'manager@soxibeta.com',
+    password: 'manager2026',
+    role: 'manager',
+    name: 'Sunil Verma',
+    title: 'Line Manager (Operations Pod)',
+    badge: 'POD LEAD',
+    portal: 'staff',
+    scope: 'Team Pod: 8 Direct Reports'
+  },
+  {
+    email: 'employee@soxibeta.com',
+    password: 'emp2026',
+    role: 'employee',
+    name: 'Aarav Sharma',
+    title: 'Employee (Self-Service ESS)',
+    badge: 'SELF-SERVICE',
+    portal: 'staff',
+    scope: 'Scoped Strictly to Self (Aarav Sharma)'
+  }
+];
+
 function sendJson(res, statusCode, data) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
@@ -125,6 +178,29 @@ const server = http.createServer(async (req, res) => {
     if (method === 'GET' && pathname === '/api/kpis') {
       const kpis = dataStore.getKpis(role, entity);
       return sendJson(res, 200, kpis);
+    }
+
+    // 2b. GET /api/ceo-metrics (Strictly CEO / CXO Scope Only)
+    if (method === 'GET' && pathname === '/api/ceo-metrics') {
+      const normalizedRole = (role || 'cxo').toLowerCase();
+      if (normalizedRole !== 'cxo') {
+        dataStore.logAuditEvent({
+          role: normalizedRole,
+          action: 'ACCESS_DENIED_CEO_MODULE',
+          target: 'CEO Executive Module',
+          status: 'BLOCKED_RBAC'
+        });
+        return sendError(res, 403, 'Access Denied: The CEO Executive Module is restricted exclusively to the Chief Executive Officer.');
+      }
+
+      const metrics = dataStore.getCeoMetrics(role, entity);
+      dataStore.logAuditEvent({
+        role: 'cxo',
+        action: 'VIEW_CEO_MODULE',
+        target: 'CEO Executive Control Suite',
+        status: 'SUCCESS'
+      });
+      return sendJson(res, 200, metrics);
     }
 
     // 3. GET /api/charts/headcount-trend
@@ -251,6 +327,59 @@ const server = http.createServer(async (req, res) => {
     if (method === 'GET' && pathname === '/api/audit-log') {
       const logs = dataStore.getAuditLog();
       return sendJson(res, 200, logs);
+    }
+
+    // 17. GET /api/auth/mock-users
+    if (method === 'GET' && pathname === '/api/auth/mock-users') {
+      return sendJson(res, 200, MOCK_USERS.map(u => ({
+        email: u.email,
+        role: u.role,
+        name: u.name,
+        title: u.title,
+        badge: u.badge,
+        portal: u.portal,
+        scope: u.scope,
+        mockPassword: u.password
+      })));
+    }
+
+    // 18. POST /api/auth/login
+    if (method === 'POST' && pathname === '/api/auth/login') {
+      const body = await parseBody(req);
+      const email = (body.email || '').trim().toLowerCase();
+      const password = (body.password || '').trim();
+
+      const user = MOCK_USERS.find(u => u.email.toLowerCase() === email && u.password === password);
+      if (!user) {
+        dataStore.logAuditEvent({
+          role: 'anonymous',
+          action: 'LOGIN_FAILURE',
+          target: email || 'Unknown Account',
+          status: 'UNAUTHORIZED'
+        });
+        return sendError(res, 401, 'Invalid credentials. Please verify your email or click a mock credential card.');
+      }
+
+      dataStore.logAuditEvent({
+        role: user.role,
+        action: 'LOGIN_SUCCESS',
+        target: `${user.portal.toUpperCase()} Portal Access (${user.email})`,
+        status: 'AUTHENTICATED'
+      });
+
+      return sendJson(res, 200, {
+        success: true,
+        token: `mock-jwt-${user.role}-${Date.now()}`,
+        user: {
+          email: user.email,
+          role: user.role,
+          name: user.name,
+          title: user.title,
+          badge: user.badge,
+          portal: user.portal,
+          scope: user.scope
+        }
+      });
     }
 
     // Static Assets

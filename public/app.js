@@ -10,6 +10,8 @@
   // Application State
   // --------------------------------------------------------------------------
   const state = {
+    currentUser: null,
+    token: null,
     currentView: 'dashboard',
     currentRole: 'cxo',
     currentEntity: 'All',
@@ -30,10 +32,10 @@
 
   const ROLE_CONFIG = {
     cxo: {
-      title: 'CXO (Enterprise Executive)',
-      badge: 'SUPER ADMIN',
-      name: 'CXO Executive Suite',
-      scope: 'Global Scope: 4 Operating Entities (600 Personnel)'
+      title: 'CEO (Chief Executive Officer)',
+      badge: 'CHIEF EXECUTIVE',
+      name: 'CEO Executive Suite',
+      scope: 'Global Enterprise Scope: 4 Entities (600 Personnel)'
     },
     chro: {
       title: 'CHRO (Chief HR Officer)',
@@ -165,7 +167,7 @@
           kpiSummaryHtml += `
             <div style="border:1px solid var(--border); padding:12px; background:var(--bg-surface);">
               <div style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--ink-secondary);">${k.label}</div>
-              <div style="font-family:var(--font-serif); font-size:24px; font-weight:700; color:var(--ink); margin:4px 0;">${k.value}</div>
+              <div style="font-family:var(--font-sans); font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--ink); margin:4px 0;">${k.value}</div>
               <div style="font-size:11px; color:var(--accent);">${k.delta} • ${k.subtext}</div>
             </div>
           `;
@@ -175,7 +177,7 @@
         showModal(
           `Executive Brief — ${config.name}`,
           `<div>
-            <div style="font-family:var(--font-mono); font-size:11px; color:var(--ink-secondary); border-bottom:1px solid var(--border); padding-bottom:8px;">
+            <div style="font-family:var(--font-sans); font-size:11px; font-weight:700; color:var(--ink-secondary); border-bottom:1px solid var(--border); padding-bottom:8px;">
               PERSPECTIVE: ${state.currentRole.toUpperCase()} | ENTITY SCOPE: ${state.currentEntity} | DATE: ${new Date().toLocaleDateString()}
             </div>
             <p style="margin-top:10px; font-size:13px; color:var(--ink);">
@@ -218,7 +220,7 @@
       svg += `<rect x="${labelWidth}" y="${y + 2}" width="${barWidth}" height="${rowHeight - 10}" fill="${barColor}">
         <title>${item.k}: ${item.v}${unit ? ' ' + unit : ''}</title>
       </rect>`;
-      svg += `<text x="${labelWidth + barWidth + 8}" y="${y + 14}" font-family="IBM Plex Mono" font-size="11" font-weight="600" fill="var(--ink)">${item.v}${unit ? unit : ''}</text>`;
+      svg += `<text x="${labelWidth + barWidth + 8}" y="${y + 14}" font-family="var(--font-sans)" font-size="11" font-weight="700" fill="var(--ink)">${item.v}${unit ? unit : ''}</text>`;
     });
 
     svg += `</svg>`;
@@ -319,7 +321,7 @@
       </path>`;
     });
 
-    svg += `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-family="Playfair Display" font-size="14" font-weight="700" fill="var(--ink)">Mix</text>`;
+    svg += `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-family="var(--font-sans)" font-size="13" font-weight="800" fill="var(--ink)">Mix</text>`;
     svg += `</svg>`;
 
     svg += `<div class="donut-legend">`;
@@ -338,6 +340,25 @@
   // --------------------------------------------------------------------------
   // Update Persona Card in Sidebar
   // --------------------------------------------------------------------------
+  // Update Persona & RBAC Visibility (CEO Module strictly CEO only)
+  // --------------------------------------------------------------------------
+  function updateRoleVisibility() {
+    const isCeo = state.currentRole === 'cxo';
+    if (isCeo) {
+      document.body.classList.add('is-ceo-role');
+    } else {
+      document.body.classList.remove('is-ceo-role');
+    }
+
+    document.querySelectorAll('.nav-ceo-only').forEach(el => {
+      if (isCeo) {
+        el.style.removeProperty('display');
+      } else {
+        el.style.setProperty('display', 'none', 'important');
+      }
+    });
+  }
+
   function updatePersonaUi() {
     const config = ROLE_CONFIG[state.currentRole] || ROLE_CONFIG.cxo;
     if (personaBadgeEl) personaBadgeEl.textContent = config.badge;
@@ -351,6 +372,7 @@
   async function renderDashboard() {
     breadcrumbCurrentEl.textContent = 'Dashboard';
     updatePersonaUi();
+    updateRoleVisibility();
 
     // Determine custom chart titles based on role
     let chart1Title = 'Headcount Trajectory (Trailing 6 Months)';
@@ -383,6 +405,16 @@
       </div>
 
       <div class="dashboard-grid">
+        ${state.currentRole === 'cxo' ? `
+          <div class="ceo-banner-card">
+            <div class="ceo-banner-content">
+              <span class="ceo-banner-badge">CEO ACTIVE</span>
+              <span class="ceo-banner-text">Authenticated in Chief Executive Suite. Full multi-entity consolidation, margins &amp; strategic sign-offs unlocked.</span>
+            </div>
+            <a href="#ceo" class="ceo-banner-action">Access CEO Executive Suite &rarr;</a>
+          </div>
+        ` : ''}
+
         <div class="kpi-section" id="kpi-cards-host">
           <div class="kpi-card hero-kpi"><div class="kpi-label">Loading KPIs...</div></div>
         </div>
@@ -679,7 +711,7 @@
         <div class="preview-section">
           <div class="preview-header">
             <div>
-              <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600;">Live Query Preview</h3>
+              <h3 style="font-family:var(--font-sans); font-size:18px; font-weight:750;">Live Query Preview</h3>
               <div class="preview-meta" id="preview-count-meta">Showing first 8 matching rows</div>
             </div>
             <div style="display:flex; gap:10px;">
@@ -1104,7 +1136,7 @@
             <div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                 <span class="badge-wired">${job.frequency}</span>
-                <span style="font-family:var(--font-mono); font-size:10px; color:var(--ink-secondary);">${job.id}</span>
+                <span style="font-family:var(--font-sans); font-size:10.5px; font-weight:700; color:var(--ink-secondary);">${job.id}</span>
               </div>
               <h4 class="schedule-title">${job.name}</h4>
               <div class="schedule-meta-row">
@@ -1203,10 +1235,10 @@
       logs.forEach(log => {
         html += `
           <tr>
-            <td style="font-family:var(--font-mono); font-size:11px;">${log.id}</td>
-            <td style="font-family:var(--font-mono); font-size:11.5px; color:var(--ink-secondary);">${new Date(log.timestamp).toLocaleString()}</td>
+            <td style="font-family:var(--font-sans); font-size:11px; font-weight:700; font-variant-numeric:tabular-nums;">${log.id}</td>
+            <td style="font-family:var(--font-sans); font-size:11.5px; font-variant-numeric:tabular-nums; color:var(--ink-secondary);">${new Date(log.timestamp).toLocaleString()}</td>
             <td><span class="badge-wired">${log.role.toUpperCase()}</span></td>
-            <td style="font-family:var(--font-mono); font-size:11.5px; font-weight:600;">${log.action}</td>
+            <td style="font-family:var(--font-sans); font-size:11.5px; font-weight:700;">${log.action}</td>
             <td style="color:var(--ink);">${log.target}</td>
             <td><span class="badge-wired">${log.status}</span></td>
           </tr>
@@ -1219,11 +1251,357 @@
   }
 
   // --------------------------------------------------------------------------
+  // VIEW: CEO Strategic Module (Strictly CEO Panel Only)
+  // --------------------------------------------------------------------------
+  async function renderCeoModule() {
+    if (state.currentRole !== 'cxo') {
+      showToast('Access Denied: CEO Executive Suite is restricted strictly to CEO role.');
+      window.location.hash = '#dashboard';
+      return;
+    }
+
+    breadcrumbCurrentEl.textContent = 'CEO Executive Suite';
+    updatePersonaUi();
+    updateRoleVisibility();
+
+    mainEl.innerHTML = `
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">CEO Strategic Control Center</h2>
+          <p class="page-subtitle">Consolidated enterprise metrics, global operating margins, talent health &amp; executive governance</p>
+        </div>
+        <div class="page-meta">
+          <span>DATA ANCHOR: CONSOLIDATED GLOBAL Q2 2026</span>
+          <div style="margin-top:6px;">
+            <button class="btn btn-secondary btn-sm" id="ceo-export-brief-btn" style="font-weight:700;">Print / Export Brief</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- CEO Strategic Overview KPIs -->
+        <div class="kpi-section" id="ceo-kpi-cards-host">
+          <div class="kpi-card hero-kpi"><div class="kpi-label">Loading Executive KPIs...</div></div>
+        </div>
+
+        <!-- Global Operating Entities Matrix -->
+        <div class="card" style="padding: 22px;">
+          <div class="section-heading">
+            <span>Global Operating Entities Matrix</span>
+            <span style="font-weight:700; color:var(--accent);">4 Operating Subsidiaries</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="ceo-matrix-table" id="ceo-entity-table">
+              <thead>
+                <tr>
+                  <th>Operating Subsidiary</th>
+                  <th>Headcount (FTE)</th>
+                  <th>Annual Payroll Run Rate</th>
+                  <th>Avg Cost / FTE</th>
+                  <th>TTM Attrition</th>
+                  <th>Talent Health</th>
+                  <th>CEO Audit Status</th>
+                  <th>Executive Action</th>
+                </tr>
+              </thead>
+              <tbody id="ceo-entity-rows">
+                <tr><td colspan="8" style="text-align:center; padding:24px; color:var(--ink-secondary);">Computing consolidated entity metrics...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Strategic Approvals & Decisions Section -->
+        <div class="card" style="padding: 22px;">
+          <div class="section-heading">
+            <span>Strategic Executive Approvals &amp; Sign-offs</span>
+            <span style="font-weight:700; color:var(--ink-secondary);">Q2/Q3 Governance Cycle</span>
+          </div>
+          <div class="ceo-decisions-grid">
+            <div class="ceo-decision-card">
+              <div>
+                <div class="ceo-decision-title">Q3 Global Headcount Requisition</div>
+                <div class="ceo-decision-desc">Authorize +12 Senior Engineering &amp; ML FTE expansion across US and Singapore subsidiaries. Budgeted payroll impact: $1.92M/yr.</div>
+              </div>
+              <button class="ceo-decision-btn" onclick="window.handleCeoDecision('Q3 Global Headcount Requisition')">Authorize Requisition</button>
+            </div>
+
+            <div class="ceo-decision-card">
+              <div>
+                <div class="ceo-decision-title">Merit Compensation Pool Adjustment</div>
+                <div class="ceo-decision-desc">Ratify 4.5% annual merit increase pool for India and UK technology hubs aligned with benchmark inflation indexes.</div>
+              </div>
+              <button class="ceo-decision-btn" onclick="window.handleCeoDecision('Merit Compensation Pool Adjustment')">Ratify Merit Pool</button>
+            </div>
+
+            <div class="ceo-decision-card">
+              <div>
+                <div class="ceo-decision-title">Strategic Key-Personnel Retention Pool</div>
+                <div class="ceo-decision-desc">Authorize secondary stock grant retention pool for critical personnel in Sales Architecture and AI Engineering pods.</div>
+              </div>
+              <button class="ceo-decision-btn" onclick="window.handleCeoDecision('Strategic Key-Personnel Retention Pool')">Sign-Off Retention Grant</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Executive Audit Log Trail -->
+        <div class="card" style="padding: 22px;">
+          <div class="section-heading">
+            <span>CEO Governance Audit Trail</span>
+            <span style="font-weight:700; color:var(--ink-tertiary);">Immutable SOX/SOC2 Verified</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="report-table" style="font-family:var(--font-sans); font-size:12px;">
+              <thead>
+                <tr>
+                  <th>Audit Ref</th>
+                  <th>Timestamp</th>
+                  <th>Principal Identity</th>
+                  <th>Executive Action</th>
+                  <th>Verification Status</th>
+                </tr>
+              </thead>
+              <tbody id="ceo-audit-rows">
+                <tr><td colspan="5" style="text-align:center; padding:18px;">Loading governance log...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Hook up export brief button
+    const exportBriefBtn = document.getElementById('ceo-export-brief-btn');
+    if (exportBriefBtn) {
+      exportBriefBtn.addEventListener('click', () => {
+        window.print();
+      });
+    }
+
+    // Fetch and render CEO metrics from backend API
+    try {
+      const data = await fetchJson(`/api/ceo-metrics?role=cxo&entity=${state.currentEntity}`);
+      
+      // Render Strategic KPIs
+      const kpiHost = document.getElementById('ceo-kpi-cards-host');
+      if (kpiHost && data.overview) {
+        const o = data.overview;
+        const kpis = [
+          { label: 'Enterprise Headcount', value: `${o.totalActive} FTE`, delta: '+8.2% YTD Expansion', subtext: 'Consolidated 4 Operating Entities' },
+          { label: 'Consolidated Annual Payroll', value: `$${o.totalPayrollM}M`, delta: `Monthly Burn: $${o.monthlyBurnM}M`, subtext: 'Budget Variance: -2.1% (Favorable)' },
+          { label: 'High-Performer Retention', value: o.retentionTopTier, delta: '+1.8% vs FY25 Target', subtext: 'Top Tier 95th Percentile' },
+          { label: 'Average Revenue / FTE', value: o.revenuePerHead, delta: '+14.2% YoY Efficiency', subtext: 'Consolidated EBITDA Factor' },
+          { label: 'Org Leverage Ratio', value: o.orgLeverageRatio, delta: 'Healthy Tier-1 Scale', subtext: 'Executive span of control' },
+          { label: 'Global Compliance Index', value: '100.0%', delta: 'Zero Exceptions (SOC2/SOX)', subtext: 'Statutory Audits Cleared' }
+        ];
+
+        let kpiHtml = '';
+        kpis.forEach((kpi, idx) => {
+          const isHero = idx === 0;
+          kpiHtml += `
+            <div class="kpi-card ${isHero ? 'hero-kpi' : ''}">
+              <div>
+                <div class="kpi-label">${kpi.label}</div>
+                <div class="kpi-value">${kpi.value}</div>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-delta positive">${kpi.delta}</span>
+                <span class="kpi-subtext">${kpi.subtext}</span>
+              </div>
+            </div>
+          `;
+        });
+        kpiHost.innerHTML = kpiHtml;
+      }
+
+      // Render Entity Matrix
+      const tbody = document.getElementById('ceo-entity-rows');
+      if (tbody && data.entities) {
+        let rowsHtml = '';
+        data.entities.forEach(item => {
+          const isHealthy = parseFloat(item.attritionPct) <= 12;
+          rowsHtml += `
+            <tr>
+              <td><strong style="color:var(--ink); font-weight:750;">${item.entity}</strong></td>
+              <td class="ceo-num">${item.headcount.toLocaleString()} FTE <span style="font-size:10px; color:var(--ink-secondary);">(of ${item.totalCount})</span></td>
+              <td class="ceo-num">$${item.annualPayroll}M</td>
+              <td class="ceo-num">${item.avgSalaryFormatted}</td>
+              <td class="ceo-num" style="color:${parseFloat(item.attritionPct) > 12 ? 'var(--negative)' : 'var(--accent)'}; font-weight:800;">${item.attritionPct}%</td>
+              <td><span class="ceo-health-pill ${isHealthy ? 'healthy' : 'warning'}">${item.marginContribution} Margin</span></td>
+              <td><span class="badge-wired">${item.runwayMonths} Runway</span></td>
+              <td>
+                <button class="btn btn-secondary btn-sm" style="font-weight:750;" onclick="window.handleEntityDrilldown('${item.entity}')">Deep Dive</button>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = rowsHtml;
+      }
+
+      // Fetch audit events for CEO table
+      const auditData = await fetchJson('/api/audit-log');
+      const auditTbody = document.getElementById('ceo-audit-rows');
+      if (auditTbody && Array.isArray(auditData)) {
+        let aHtml = '';
+        auditData.slice(0, 5).forEach(evt => {
+          aHtml += `
+            <tr>
+              <td style="font-family:var(--font-sans); font-variant-numeric:tabular-nums; font-weight:700; color:var(--ink-secondary);">${evt.id}</td>
+              <td style="font-family:var(--font-sans); font-variant-numeric:tabular-nums; color:var(--ink-secondary);">${new Date(evt.timestamp).toLocaleDateString()} ${new Date(evt.timestamp).toLocaleTimeString()}</td>
+              <td><strong style="color:var(--ink); font-weight:700;">${evt.role.toUpperCase()}</strong></td>
+              <td><span style="font-weight:700; color:var(--accent);">${evt.action}</span></td>
+              <td><span class="badge-wired">PASSED (P-256)</span></td>
+            </tr>
+          `;
+        });
+        auditTbody.innerHTML = aHtml;
+      }
+    } catch (err) {
+      console.error('Error fetching CEO metrics:', err);
+      showToast('Error loading CEO metrics: ' + (err.error || err.message));
+    }
+  }
+
+  window.handleCeoDecision = function(title) {
+    showToast(`Decision Authorized & Signed: "${title}". Executive audit logged.`);
+  };
+
+  window.handleEntityDrilldown = function(entityName) {
+    state.currentEntity = entityName;
+    if (entitySelectEl) entitySelectEl.value = entityName;
+    showToast(`Scoping enterprise view to ${entityName}`);
+    window.location.hash = '#library';
+  };
+
+  // --------------------------------------------------------------------------
+  // Authentication Gateway (Simple, Clean, Modern Login Card)
+  // --------------------------------------------------------------------------
+  const authOverlayEl = document.getElementById('auth-overlay');
+  const appLayoutEl = document.getElementById('app-layout');
+  const loginForm = document.getElementById('login-form');
+  const loginEmailInput = document.getElementById('login-email');
+  const loginPasswordInput = document.getElementById('login-password');
+  const rolePillsContainer = document.getElementById('role-pills-container');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  function initAuthUi() {
+    // Check existing session
+    const savedSession = sessionStorage.getItem('reportos_auth');
+    if (savedSession) {
+      try {
+        const session = JSON.parse(savedSession);
+        state.currentUser = session.user;
+        state.token = session.token;
+        state.currentRole = session.user.role;
+        if (roleSelectEl) roleSelectEl.value = state.currentRole;
+        hideAuthOverlay();
+        return true;
+      } catch (e) {
+        sessionStorage.removeItem('reportos_auth');
+      }
+    }
+    showAuthOverlay();
+    return false;
+  }
+
+  function showAuthOverlay() {
+    if (authOverlayEl) authOverlayEl.classList.remove('hidden');
+    if (appLayoutEl) appLayoutEl.style.display = 'none';
+  }
+
+  function hideAuthOverlay() {
+    if (authOverlayEl) authOverlayEl.classList.add('hidden');
+    if (appLayoutEl) appLayoutEl.style.display = 'flex';
+  }
+
+  window.quickFill = function(email, password, role) {
+    if (loginEmailInput) loginEmailInput.value = email;
+    if (loginPasswordInput) loginPasswordInput.value = password;
+    
+    const previewEl = document.getElementById('preview-cred-code');
+    if (previewEl) previewEl.textContent = `${email} / ${password}`;
+
+    const destEl = document.getElementById('auth-role-dest');
+
+    if (rolePillsContainer) {
+      rolePillsContainer.querySelectorAll('.role-pill').forEach(pill => {
+        if (pill.getAttribute('data-role') === role) {
+          pill.classList.add('active');
+          const dest = pill.getAttribute('data-dest');
+          if (destEl && dest) destEl.textContent = dest;
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+    }
+  };
+
+  async function performLogin(email, password) {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Authentication failed');
+      }
+
+      state.currentUser = data.user;
+      state.token = data.token;
+      state.currentRole = data.user.role;
+      sessionStorage.setItem('reportos_auth', JSON.stringify(data));
+
+      if (roleSelectEl) roleSelectEl.value = state.currentRole;
+      hideAuthOverlay();
+
+      showToast(`Authenticated: ${data.user.name} (${data.user.title})`);
+      updatePersonaUi();
+      updateRoleVisibility();
+
+      // Routing logic:
+      // CEO -> Lands directly on CEO Strategic Control Center (#ceo)
+      // Others -> Lands on Dashboard (#dashboard)
+      if (data.user.role === 'cxo') {
+        window.location.hash = '#ceo';
+      } else {
+        window.location.hash = '#dashboard';
+      }
+      handleHashChange();
+    } catch (err) {
+      showToast('Login Failed: ' + err.message);
+    }
+  }
+
+  function handleLogout() {
+    sessionStorage.removeItem('reportos_auth');
+    state.currentUser = null;
+    state.token = null;
+    showToast('Signed out successfully. Returning to Identity Gateway.');
+    showAuthOverlay();
+  }
+
+  // --------------------------------------------------------------------------
   // Router & Navigation
   // --------------------------------------------------------------------------
   function navigate(viewName) {
-    const validViews = ['dashboard', 'library', 'builder', 'copilot', 'schedules', 'audit'];
-    state.currentView = validViews.includes(viewName) ? viewName : 'dashboard';
+    // If not authenticated, ensure login overlay is visible
+    if (!state.currentUser && !sessionStorage.getItem('reportos_auth')) {
+      showAuthOverlay();
+      return;
+    }
+
+    const validViews = ['dashboard', 'ceo', 'library', 'builder', 'copilot', 'schedules', 'audit'];
+    
+    // Strict RBAC: CEO Module is strictly restricted to CEO identity
+    if (viewName === 'ceo' && state.currentRole !== 'cxo') {
+      showToast('Access Denied: CEO Executive Suite is strictly restricted to the CEO role.');
+      window.location.hash = '#dashboard';
+      return;
+    }
+
+    state.currentView = validViews.includes(viewName) ? viewName : (state.currentRole === 'cxo' ? 'ceo' : 'dashboard');
 
     document.querySelectorAll('.nav-item').forEach(el => {
       if (el.getAttribute('data-view') === state.currentView) {
@@ -1234,6 +1612,7 @@
     });
 
     if (state.currentView === 'dashboard') renderDashboard();
+    else if (state.currentView === 'ceo') renderCeoModule();
     else if (state.currentView === 'library') renderReportLibrary();
     else if (state.currentView === 'builder') renderCustomBuilder();
     else if (state.currentView === 'copilot') renderCopilot();
@@ -1243,7 +1622,8 @@
 
   function handleHashChange() {
     const hash = window.location.hash.replace(/^#/, '');
-    navigate(hash || 'dashboard');
+    const defaultView = state.currentRole === 'cxo' ? 'ceo' : 'dashboard';
+    navigate(hash || defaultView);
   }
 
   window.addEventListener('hashchange', handleHashChange);
@@ -1252,6 +1632,34 @@
   // Initialization
   // --------------------------------------------------------------------------
   async function initApp() {
+    // Role pills selection
+    if (rolePillsContainer) {
+      rolePillsContainer.querySelectorAll('.role-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          const email = pill.getAttribute('data-email');
+          const pass = pill.getAttribute('data-pass');
+          const role = pill.getAttribute('data-role');
+          window.quickFill(email, pass, role);
+        });
+      });
+    }
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = loginEmailInput.value.trim();
+        const password = loginPasswordInput.value.trim();
+        performLogin(email, password);
+      });
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', handleLogout);
+    }
+
+    // Check auth session
+    initAuthUi();
+
     try {
       state.meta = await fetchJson(`/api/meta?role=${state.currentRole}`);
       if (entitySelectEl && state.meta.entities) {
@@ -1270,9 +1678,16 @@
     if (roleSelectEl) {
       roleSelectEl.addEventListener('change', () => {
         state.currentRole = roleSelectEl.value;
-        showToast(`Switched active identity to ${state.currentRole.toUpperCase()}`);
+        showToast(`Switched active perspective to ${state.currentRole.toUpperCase()}`);
         updatePersonaUi();
-        handleHashChange();
+        updateRoleVisibility();
+
+        // If currently in CEO view and user changes away from CEO, redirect to dashboard
+        if (state.currentView === 'ceo' && state.currentRole !== 'cxo') {
+          window.location.hash = '#dashboard';
+        } else {
+          handleHashChange();
+        }
       });
     }
 
@@ -1281,6 +1696,7 @@
         state.currentEntity = entitySelectEl.value;
         showToast(`Filtered perspective to ${state.currentEntity}`);
         if (state.currentView === 'dashboard') renderDashboard();
+        else if (state.currentView === 'ceo') renderCeoModule();
       });
     }
 
@@ -1292,6 +1708,7 @@
     }
 
     updatePersonaUi();
+    updateRoleVisibility();
     handleHashChange();
   }
 

@@ -5,15 +5,114 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ReportOS — Universal HR Reporting Engine</title>
   
-  <!-- Google Fonts: Playfair Display, DM Sans, IBM Plex Mono -->
+  <!-- Google Fonts: Inter and DM Sans (Clean, Bold, High-Legibility Modern Sans) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..900;1,9..40,400..900&family=Inter:ital,opsz,wght@0,14..32,400..900;1,14..32,400..900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="styles.css?t=1788718420">
+  <link rel="stylesheet" href="styles.css?t=1788759000">
 </head>
 <body>
-  <div class="app-layout">
+  <!-- Simplified, Clean & Professional Login Screen -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-box">
+      <div class="auth-header">
+        <div class="brand-block" style="border:none; padding:0; justify-content:center;">
+          <div class="brand-mark">
+            <span class="brand-monogram">R</span>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">ReportOS</h1>
+            <span class="brand-edition">Enterprise HRMS</span>
+          </div>
+        </div>
+        <p class="auth-subtitle">Sign in to your role-based workspace</p>
+      </div>
+
+      <!-- Quick Role Selector Bar -->
+      <div class="auth-role-selector-label">
+        <span>Select Demo Role</span>
+        <span class="auth-role-dest" id="auth-role-dest">Directs to CEO Suite (#ceo)</span>
+      </div>
+      <div class="role-pills" id="role-pills-container">
+        <button type="button" class="role-pill active" data-role="cxo" data-email="ceo@soxibeta.com" data-pass="ceo2026" data-dest="Directs to CEO Suite (#ceo)">
+          <span class="role-pill-badge ceo">CEO</span>
+          <span class="role-pill-name">Executive</span>
+        </button>
+        <button type="button" class="role-pill" data-role="chro" data-email="chro@soxibeta.com" data-pass="chro2026" data-dest="Directs to Staff Dashboard (#dashboard)">
+          <span class="role-pill-badge">CHRO</span>
+          <span class="role-pill-name">Chief HR</span>
+        </button>
+        <button type="button" class="role-pill" data-role="hrbp" data-email="hrbp@soxibeta.com" data-pass="hrbp2026" data-dest="Directs to Staff Dashboard (#dashboard)">
+          <span class="role-pill-badge">HRBP</span>
+          <span class="role-pill-name">Sales</span>
+        </button>
+        <button type="button" class="role-pill" data-role="manager" data-email="manager@soxibeta.com" data-pass="manager2026" data-dest="Directs to Staff Dashboard (#dashboard)">
+          <span class="role-pill-badge">MGR</span>
+          <span class="role-pill-name">Manager</span>
+        </button>
+        <button type="button" class="role-pill" data-role="employee" data-email="employee@soxibeta.com" data-pass="emp2026" data-dest="Directs to Staff Dashboard (#dashboard)">
+          <span class="role-pill-badge">EMP</span>
+          <span class="role-pill-name">Employee</span>
+        </button>
+      </div>
+
+      <!-- Single Clean Login Form -->
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <input type="email" id="login-email" class="auth-input" value="ceo@soxibeta.com" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" id="login-password" class="auth-input" value="ceo2026" required autocomplete="current-password">
+        </div>
+        
+        <div class="auth-active-cred-preview" id="auth-active-cred-preview">
+          <span class="preview-label">Active Credentials:</span>
+          <code id="preview-cred-code">ceo@soxibeta.com / ceo2026</code>
+        </div>
+
+        <button type="submit" class="btn btn-primary auth-submit-btn" id="login-submit-btn">
+          Sign In to Portal &rarr;
+        </button>
+      </form>
+
+      <!-- Clean Collapsible Mock Credentials reference -->
+      <details class="auth-creds-details">
+        <summary class="creds-summary-toggle">View All Mock Credentials</summary>
+        <div class="creds-table-compact">
+          <div class="cred-row" onclick="window.quickFill('ceo@soxibeta.com', 'ceo2026', 'cxo')">
+            <span class="cred-col-role">👑 CEO</span>
+            <span class="cred-col-email">ceo@soxibeta.com</span>
+            <span class="cred-col-pass">ceo2026</span>
+          </div>
+          <div class="cred-row" onclick="window.quickFill('chro@soxibeta.com', 'chro2026', 'chro')">
+            <span class="cred-col-role">👥 CHRO</span>
+            <span class="cred-col-email">chro@soxibeta.com</span>
+            <span class="cred-col-pass">chro2026</span>
+          </div>
+          <div class="cred-row" onclick="window.quickFill('hrbp@soxibeta.com', 'hrbp2026', 'hrbp')">
+            <span class="cred-col-role">💼 HRBP</span>
+            <span class="cred-col-email">hrbp@soxibeta.com</span>
+            <span class="cred-col-pass">hrbp2026</span>
+          </div>
+          <div class="cred-row" onclick="window.quickFill('manager@soxibeta.com', 'manager2026', 'manager')">
+            <span class="cred-col-role">⚡ Manager</span>
+            <span class="cred-col-email">manager@soxibeta.com</span>
+            <span class="cred-col-pass">manager2026</span>
+          </div>
+          <div class="cred-row" onclick="window.quickFill('employee@soxibeta.com', 'emp2026', 'employee')">
+            <span class="cred-col-role">👤 Employee</span>
+            <span class="cred-col-email">employee@soxibeta.com</span>
+            <span class="cred-col-pass">emp2026</span>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="app-layout" id="app-layout">
     <!-- Left Navigation Sidebar -->
     <aside class="sidebar">
       <div class="brand-block">
@@ -30,13 +129,21 @@
       <div class="persona-card" id="persona-card">
         <div class="persona-header">
           <span class="persona-label">ACTIVE IDENTITY</span>
-          <span class="persona-badge" id="persona-badge">SUPER ADMIN</span>
+          <span class="persona-badge" id="persona-badge">CHIEF EXECUTIVE</span>
         </div>
-        <div class="persona-name" id="persona-name">CXO Executive Suite</div>
+        <div class="persona-name" id="persona-name">CEO Executive Suite</div>
         <div class="persona-scope" id="persona-scope">Global Scope: 4 Operating Entities</div>
       </div>
 
       <nav class="nav-menu">
+        <!-- CEO Executive Module (Strictly CEO Panel Only) -->
+        <div class="nav-section-label nav-ceo-only" id="nav-section-ceo">Executive Governance</div>
+        <a href="#ceo" class="nav-item nav-item-ceo nav-ceo-only" data-view="ceo" id="nav-ceo-module">
+          <span class="nav-indicator"></span>
+          <span class="nav-label">CEO Executive Suite</span>
+          <span class="nav-badge-pill ceo-badge-pill">CEO ONLY</span>
+        </a>
+
         <div class="nav-section-label">Core Platform</div>
         <a href="#dashboard" class="nav-item active" data-view="dashboard">
           <span class="nav-indicator"></span>
@@ -74,6 +181,9 @@
           <span class="status-text" id="footer-status-text">600 Verified Records</span>
         </div>
         <div class="system-meta">Zero Dependency Engine v2.5</div>
+        <button type="button" class="btn-logout" id="logout-btn" title="Sign out to return to login portal">
+          Sign Out &larr;
+        </button>
       </div>
     </aside>
 
@@ -99,7 +209,7 @@
           <div class="control-group">
             <label class="control-label" for="role-select">Role Identity</label>
             <select id="role-select" class="select-input">
-              <option value="cxo">CXO (Enterprise Executive)</option>
+              <option value="cxo">CEO (Chief Executive Officer)</option>
               <option value="chro">CHRO (Chief HR Officer)</option>
               <option value="hrbp">HRBP (Sales Department Scope)</option>
               <option value="manager">Line Manager (Management Pod)</option>
@@ -150,6 +260,6 @@
     </div>
   </div>
 
-  <script src="app.js?t=1788718420"></script>
+  <script src="app.js?t=1788759000"></script>
 </body>
 </html>
