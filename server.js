@@ -28,7 +28,7 @@ function sendJson(res, statusCode, data) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'no-cache'
+    'Cache-Control': 'no-cache, no-store, must-revalidate'
   });
   res.end(JSON.stringify(data));
 }
@@ -38,7 +38,7 @@ function sendCsv(res, filename, csvString) {
     'Content-Type': 'text/csv; charset=utf-8',
     'Content-Disposition': `attachment; filename="${filename}.csv"`,
     'Access-Control-Allow-Origin': '*',
-    'Cache-Control': 'no-cache'
+    'Cache-Control': 'no-cache, no-store, must-revalidate'
   });
   res.end(csvString);
 }
@@ -68,7 +68,8 @@ function parseBody(req) {
 
 function serveStatic(req, res, pathname) {
   let relativePath = pathname === '/' ? 'index.html' : pathname;
-  const safePath = path.normalize(relativePath).replace(/^(\.\.[\/\\])+/, '');
+  const cleanPath = relativePath.split('?')[0];
+  const safePath = path.normalize(cleanPath).replace(/^(\.\.[\/\\])+/, '');
   const filePath = path.join(PUBLIC_DIR, safePath);
 
   if (!filePath.startsWith(PUBLIC_DIR)) {
@@ -83,10 +84,13 @@ function serveStatic(req, res, pathname) {
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
+    // Disable caching completely so browser always gets the newest UI
     res.writeHead(200, {
       'Content-Type': contentType,
       'Content-Length': stats.size,
-      'Cache-Control': 'public, max-age=3600'
+      'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0'
     });
 
     const stream = fs.createReadStream(filePath);
@@ -99,12 +103,13 @@ const server = http.createServer(async (req, res) => {
   const pathname = parsedUrl.pathname;
   const method = req.method.toUpperCase();
   const role = parsedUrl.query.role || req.headers['x-role'] || 'cxo';
+  const entity = parsedUrl.query.entity || req.headers['x-entity'] || 'All';
 
   if (method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-Role'
+      'Access-Control-Allow-Headers': 'Content-Type, X-Role, X-Entity'
     });
     return res.end();
   }
@@ -116,31 +121,31 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, meta);
     }
 
-    // 2. GET /api/kpis?role=<role>
+    // 2. GET /api/kpis
     if (method === 'GET' && pathname === '/api/kpis') {
-      const kpis = dataStore.getKpis(role);
+      const kpis = dataStore.getKpis(role, entity);
       return sendJson(res, 200, kpis);
     }
 
     // 3. GET /api/charts/headcount-trend
     if (method === 'GET' && pathname === '/api/charts/headcount-trend') {
-      const data = dataStore.getHeadcountTrend(role);
+      const data = dataStore.getHeadcountTrend(role, entity);
       return sendJson(res, 200, data);
     }
 
     // 4. GET /api/charts/attrition-by-dept
     if (method === 'GET' && pathname === '/api/charts/attrition-by-dept') {
-      const data = dataStore.getAttritionByDept(role);
+      const data = dataStore.getAttritionByDept(role, entity);
       return sendJson(res, 200, data);
     }
 
     // 5. GET /api/charts/gender-mix
     if (method === 'GET' && pathname === '/api/charts/gender-mix') {
-      const data = dataStore.getGenderMix(role);
+      const data = dataStore.getGenderMix(role, entity);
       return sendJson(res, 200, data);
     }
 
-    // 6. GET /api/reports?category=<name|All>&role=<role>
+    // 6. GET /api/reports
     if (method === 'GET' && pathname === '/api/reports') {
       const category = parsedUrl.query.category || 'All';
       const catalog = reportDefs.getReportCatalog(category, role);
@@ -157,7 +162,6 @@ const server = http.createServer(async (req, res) => {
         return sendError(res, 404, `Report ID '${reportId}' was not found in the catalog.`);
       }
 
-      // Check RBAC permission
       const normalizedRole = role.toLowerCase();
       if (report.allowedRoles && !report.allowedRoles.includes(normalizedRole)) {
         dataStore.logAuditEvent({
@@ -263,8 +267,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n======================================================`);
-  console.log(`  ReportOS — Universal HR Reporting Engine v2.0`);
-  console.log(`  Running on http://localhost:${PORT}`);
-  console.log(`  Enterprise RBAC | 21 Executable Reports | Zero Dependencies`);
+  console.log(`  ReportOS Server Active at http://localhost:${PORT}`);
+  console.log(`  Cache-Control: Disabled (Instant Live Reload)`);
   console.log(`======================================================\n`);
 });

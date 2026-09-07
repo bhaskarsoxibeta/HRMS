@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ReportOS — Universal HR Reporting Engine</title>
   
-  <!-- Typography: Playfair Display, DM Sans, IBM Plex Mono -->
+  <!-- Google Fonts: Playfair Display, DM Sans, IBM Plex Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?t=1788718420">
 </head>
 <body>
   <div class="app-layout">
@@ -29,7 +29,7 @@
       <!-- Active Persona / Identity Scoping Card -->
       <div class="persona-card" id="persona-card">
         <div class="persona-header">
-          <span class="persona-label">ACTIVE PERSONA</span>
+          <span class="persona-label">ACTIVE IDENTITY</span>
           <span class="persona-badge" id="persona-badge">SUPER ADMIN</span>
         </div>
         <div class="persona-name" id="persona-name">CXO Executive Suite</div>
@@ -45,7 +45,7 @@
         <a href="#library" class="nav-item" data-view="library">
           <span class="nav-indicator"></span>
           <span class="nav-label">Report Library</span>
-          <span class="nav-badge" id="nav-reports-count">21</span>
+          <span class="nav-badge" id="nav-reports-count">21/21</span>
         </a>
         <a href="#builder" class="nav-item" data-view="builder">
           <span class="nav-indicator"></span>
@@ -73,7 +73,7 @@
           <span class="status-dot"></span>
           <span class="status-text" id="footer-status-text">600 Verified Records</span>
         </div>
-        <div class="system-meta">Zero Dependency Engine v2.0</div>
+        <div class="system-meta">Zero Dependency Engine v2.5</div>
       </div>
     </aside>
 
@@ -90,8 +90,8 @@
         </div>
 
         <div class="topbar-right">
-          <!-- Theme Switcher (Light Paper / Dark Warm-Neutral) -->
-          <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle Light / Dark Theme">
+          <!-- Theme Toggle Switch -->
+          <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle Light / Dark Mode">
             THEME: LIGHT
           </button>
 
@@ -150,6 +150,6 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?t=1788718420"></script>
 </body>
 </html>
